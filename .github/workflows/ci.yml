@@ -1,0 +1,175 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  lint:
+    name: Lint Shell Scripts
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup ShellCheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck
+
+      - name: Run ShellCheck
+        run: |
+          echo "Running ShellCheck on all shell scripts..."
+          find . -name "*.sh" -type f | while read -r script; do
+            echo "Checking: $script"
+            shellcheck "$script"
+          done
+
+      - name: Check script permissions
+        run: |
+          echo "Checking script permissions..."
+          find scripts -name "*.sh" -type f | while read -r script; do
+            if [[ ! -x "$script" ]]; then
+              echo "Error: Script $script is not executable"
+              exit 1
+            fi
+          done
+
+  format:
+    name: Check Shell Formatting
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup shfmt
+        run: |
+          curl -L "https://github.com/mvdan/sh/releases/latest/download/shfmt_v3.7.0_linux_amd64" -o shfmt
+          chmod +x shfmt
+          sudo mv shfmt /usr/local/bin/
+
+      - name: Check formatting
+        run: |
+          echo "Checking shell script formatting..."
+          find . -name "*.sh" -type f | xargs shfmt -l -d
+
+  test:
+    name: Test Action
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Test action with default inputs
+        uses: ./
+        id: test-default
+        with:
+          example-input: "test-value"
+
+      - name: Test action with custom inputs
+        uses: ./
+        id: test-custom
+        with:
+          example-input: "custom-test-value"
+          log-level: "debug"
+          working-directory: "."
+
+      - name: Verify outputs
+        run: |
+          echo "Default test output: ${{ steps.test-default.outputs.example-output }}"
+          echo "Default execution time: ${{ steps.test-default.outputs.execution-time }}"
+          echo "Custom test output: ${{ steps.test-custom.outputs.example-output }}"
+          echo "Custom execution time: ${{ steps.test-custom.outputs.execution-time }}"
+          
+          # Verify outputs are not empty
+          if [[ -z "${{ steps.test-default.outputs.example-output }}" ]]; then
+            echo "Error: Default test output is empty"
+            exit 1
+          fi
+          
+          if [[ -z "${{ steps.test-custom.outputs.example-output }}" ]]; then
+            echo "Error: Custom test output is empty"
+            exit 1
+          fi
+
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Bandit security scan
+        run: |
+          # Check for common security issues in shell scripts
+          echo "Checking for potential security issues..."
+          
+          # Check for hardcoded secrets
+          if grep -r -i "password\|secret\|key\|token" scripts/ --include="*.sh" | grep -v "INPUT_"; then
+            echo "Warning: Potential hardcoded secrets found"
+          fi
+          
+          # Check for eval usage
+          if grep -r "eval" scripts/ --include="*.sh"; then
+            echo "Warning: eval usage found - review for security implications"
+          fi
+          
+          # Check for curl without verification
+          if grep -r "curl.*-k\|curl.*--insecure" scripts/ --include="*.sh"; then
+            echo "Error: Insecure curl usage found"
+            exit 1
+          fi
+
+  validate-action:
+    name: Validate Action Metadata
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate action.yml
+        run: |
+          echo "Validating action.yml structure..."
+          
+          # Check if action.yml exists
+          if [[ ! -f "action.yml" ]]; then
+            echo "Error: action.yml not found"
+            exit 1
+          fi
+          
+          # Basic YAML syntax check
+          python3 -c "import yaml; yaml.safe_load(open('action.yml'))" || {
+            echo "Error: action.yml has invalid YAML syntax"
+            exit 1
+          }
+          
+          echo "action.yml validation passed"
+
+      - name: Check required files
+        run: |
+          echo "Checking for required files..."
+          
+          required_files=(
+            "action.yml"
+            "README.md"
+            "LICENSE"
+            "scripts/main.sh"
+            "scripts/utils.sh"
+          )
+          
+          for file in "${required_files[@]}"; do
+            if [[ ! -f "$file" ]]; then
+              echo "Error: Required file missing: $file"
+              exit 1
+            fi
+          done
+          
+          echo "All required files present"
