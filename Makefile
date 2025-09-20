@@ -14,7 +14,7 @@ test: ## Run all tests
 
 lint: check-tools ## Run ShellCheck on all shell scripts
 	@echo "Running ShellCheck..."
-	@find . -name "*.sh" -type f | xargs shellcheck
+	@find . -name "*.sh" -type f | xargs shellcheck -e SC1091
 
 format: check-tools ## Check shell script formatting with shfmt
 	@echo "Checking shell script formatting..."

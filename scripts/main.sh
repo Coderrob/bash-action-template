@@ -13,11 +13,11 @@ source "$(dirname "${BASH_SOURCE[0]}")/utils.sh"
 init_logging "${INPUT_LOG_LEVEL:-info}"
 
 # Global variables
-readonly SCRIPT_DIR
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly SCRIPT_DIR
 readonly ACTION_NAME="bash-action-template"
-readonly START_TIME
 START_TIME=$(date +%s)
+readonly START_TIME
 
 # Main function
 main() {
