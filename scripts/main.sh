@@ -28,7 +28,9 @@ main() {
     
     # Validate environment
     validate_environment
-    
+
+    # Validate inputs
+    validate_inputs
     # Process inputs
     local example_input="${INPUT_EXAMPLE_INPUT:-}"
     local working_directory="${INPUT_WORKING_DIRECTORY:-.}"
