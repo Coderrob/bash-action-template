@@ -47,7 +47,7 @@ assert_equals() {
     
     ((TESTS_RUN++))
     
-    echo "Debug: Comparing '${expected}' with '${actual}' for test '${test_name}'"
+    log_debug "Comparing '${expected}' with '${actual}' for test '${test_name}'"
     
     if [[ "${expected}" == "${actual}" ]]; then
         echo -e "${GREEN}✓${NC} ${test_name}: PASSED"
