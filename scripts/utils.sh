@@ -42,7 +42,8 @@ init_logging() {
             ;;
         *)
             LOG_LEVEL=${LOG_LEVEL_INFO}
-            log_warn "Invalid log level '${level}', defaulting to 'info'"
+            # Print warning directly to stderr to avoid recursion
+            echo -e "${COLOR_YELLOW}[WARN]${COLOR_NC} Invalid log level '${level}', defaulting to 'info'" >&2
             ;;
     esac
     
