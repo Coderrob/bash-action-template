@@ -1,5 +1,24 @@
 #!/bin/bash
 
+#==============================================================================
+#
+#    Copyright (C) 2025 Robert Lindley
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+#==============================================================================
+
 # Simple test runner for the bash action template
 
 set -euo pipefail
@@ -81,7 +100,7 @@ export GITHUB_OUTPUT="${temp_output_file}"
 # Run the main script
 if timeout 30 ./scripts/main.sh >/dev/null 2>&1; then
     echo "✓ Main script executes successfully"
-    
+
     # Check if output was generated
     if [[ -f "${temp_output_file}" ]]; then
         echo "✓ Output file created"

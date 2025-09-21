@@ -50,8 +50,8 @@ build/
 out/
 
 # Test artifacts
-test-results/
-test-output/
+tests/results/
+tests/output/
 
 # Security
 *.pem

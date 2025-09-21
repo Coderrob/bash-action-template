@@ -1,0 +1,29 @@
+# Prettier ignore patterns
+# See: https://prettier.io/docs/en/ignore.html
+
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+
+# Git
+.git/
+
+# CI
+.github/
+
+# Shell scripts (handled by shfmt)
+*.sh
+
+# Other files
+*.lock
+*.log
+*.tmp
+*.temp
+
+# License and other plain text files
+LICENSE
+.gitignore
+.shellcheckrc

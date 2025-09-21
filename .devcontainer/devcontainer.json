@@ -1,0 +1,41 @@
+{
+  "build": {
+    "context": "..",
+    "dockerfile": "../Dockerfile"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.vscode-json",
+        "ms-vscode.makefile-tools",
+        "timonwong.shellcheck",
+        "foxgis.shell-format",
+        "esbenp.prettier-vscode",
+        "ms-vscode.vscode-github-actions",
+        "ms-vscode.vscode-docker",
+        "github.copilot"
+      ],
+      "settings": {
+        "editor.codeActionsOnSave": {
+          "source.fixAll.shellcheck": "explicit"
+        },
+        "editor.formatOnSave": true,
+        "prettier.configPath": ".prettierrc.yml",
+        "shellcheck.customArgs": ["--shell=bash", "--external-sources"],
+        "shellformat.flag": "-i 4 -ci"
+      }
+    }
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/node:1": {}
+  },
+  "forwardPorts": [],
+  "mounts": [
+    "source=${localWorkspaceFolder}/.git,target=/workspaces/bash-action-template/.git,type=bind,consistency=cached"
+  ],
+  "name": "Bash Action Development",
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+  "remoteUser": "vscode"
+}

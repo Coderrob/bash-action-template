@@ -1,0 +1,168 @@
+site_name: Bash Action Template
+site_description: A comprehensive template for creating GitHub Actions using bash scripts with industry best practices
+site_author: Bash Action Template Community
+site_url: https://coderrob.github.io/bash-action-template/
+
+repo_name: bash-action-template
+repo_url: https://github.com/Coderrob/bash-action-template
+edit_uri: edit/main/docs/
+
+copyright: Copyright &copy; 2025 Bash Action Template
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: blue
+      accent: blue
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: blue
+      accent: blue
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+  features:
+    - announce.dismiss
+    - content.action.edit
+    - content.action.view
+    - content.code.annotate
+    - content.code.copy
+    - content.code.select
+    - content.footnote.tooltips
+    - content.tabs.link
+    - content.tooltips
+    - header.autohide
+    - navigation.expand
+    - navigation.footer
+    - navigation.indexes
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.instant.progress
+    - navigation.prune
+    - navigation.sections
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - search.share
+    - search.suggest
+    - toc.follow
+    - toc.integrate
+
+plugins:
+  - search
+  - minify:
+      minify_html: true
+  - git-revision-date-localized:
+      enable_creation_date: true
+      type: timeago
+  - git-committers:
+      repository: Coderrob/bash-action-template
+      branch: main
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - meta
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.magiclink:
+      normalize_issue_symbols: true
+      repo_url_shorthand: true
+      user: Coderrob
+      repo: bash-action-template
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets:
+      check_paths: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+      combine_header_slug: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Welcome: getting-started/index.md
+      - Quick Start: getting-started/quick-start.md
+      - Development Setup: getting-started/development-setup.md
+      - DevContainer: getting-started/devcontainer.md
+      - Forking & Customizing: getting-started/forking-and-customizing.md
+  - Features:
+      - Overview: features/index.md
+      - Self-Healing: features/self-healing.md
+      - Testing & CI: features/testing-ci.md
+      - DevContainer: features/devcontainer.md
+      - Logging & Monitoring: features/logging-monitoring.md
+      - Security: features/security.md
+  - Extending:
+      - Overview: extending/index.md
+      - Custom Inputs/Outputs: extending/custom-io.md
+      - Utility Functions: extending/utilities.md
+      - Advanced Scripting: extending/advanced-scripting.md
+      - Composite Actions: extending/composite-actions.md
+  - Examples:
+      - Overview: examples/index.md
+      - Basic Usage: examples/basic-usage.md
+      - Advanced Scenarios: examples/advanced-scenarios.md
+      - Real World Cases: examples/real-world.md
+  - Troubleshooting:
+      - Common Issues: troubleshooting/common-issues.md
+      - Runbooks:
+          - Quick Fixes: runbooks/quick-fixes.md
+          - Maintenance: runbooks/maintenance.md
+          - Self-Healing: runbooks/self-healing.md
+          - Recovery: runbooks/recovery.md
+  - Contributing: contributing.md
+  - Changelog: changelog.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Coderrob/bash-action-template
+    - icon: fontawesome/brands/docker
+      link: https://hub.docker.com
+  generator: false
+
+extra_css:
+  - stylesheets/extra.css

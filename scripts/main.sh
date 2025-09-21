@@ -1,119 +1,433 @@
 #!/bin/bash
 
-# Main script for the GitHub Action
-# This script demonstrates best practices for bash scripting in GitHub Actions
+#==============================================================================
+#
+#    Copyright (C) 2025 Robert Lindley
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+#==============================================================================
 
-set -euo pipefail  # Exit on error, undefined vars, and pipe failures
+#==============================================================================
+# GitHub Action: Bash Action Template
+#==============================================================================
+# Description: Production-ready main script demonstrating shell scripting best
+#              practices, functional programming, and enterprise observability
+# Version:     2.0.0
+# Author:      GitHub Action Template
+# License:     MIT
+#
+# Purpose:     This script serves as the primary entry point for the GitHub Action,
+#              implementing zero-boilerplate initialization, pure functional
+#              programming patterns, and comprehensive observability features.
+#
+# Dependencies:
+#   - Bash 4.4+
+#   - init.sh (centralized initialization)
+#   - functional_utils.sh (pure function library)
+#
+# Environment Variables (GitHub Actions Inputs):
+#   INPUT_USER_INPUT      - User-provided input for processing
+#   INPUT_LOG_LEVEL       - Logging verbosity (debug|info|warn|error)
+#   INPUT_INCLUDE_SUMMARY - Whether to generate execution summary (true|false)
+#   INPUT_WORKING_DIRECTORY - Working directory for operations
+#
+# Outputs:
+#   example-output        - Processed result from input transformation
+#   execution-time        - Script execution duration in seconds
+#   script-version        - Version of the action script
+#
+# Exit Codes:
+#   0 - Success
+#   1 - Validation errors or processing failures
+#   2 - Environment compatibility issues
+#==============================================================================
 
-# Source utility functions
-# shellcheck source=./utils.sh
-source "$(dirname "${BASH_SOURCE[0]}")/utils.sh"
+# Source the initialization utility (handles all common setup)
+# shellcheck source=./init.sh
+source "$(dirname "${BASH_SOURCE[0]}")/init.sh"
 
-# Initialize logging
-init_logging "${INPUT_LOG_LEVEL:-info}"
+# Source functional utilities
+# shellcheck source=./functional_utils.sh
+source "$(dirname "${BASH_SOURCE[0]}")/functional_utils.sh"
 
-# Global variables
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-readonly SCRIPT_DIR
+# Readonly global constants (immutable by design)
 readonly ACTION_NAME="bash-action-template"
-START_TIME=$(date +%s)
-readonly START_TIME
+readonly ACTION_VERSION="2.0.0"
+readonly MIN_BASH_VERSION="4.4"
 
-# Main function
-main() {
-    log_info "Starting ${ACTION_NAME}"
-    log_debug "Script directory: ${SCRIPT_DIR}"
-    log_debug "Working directory: $(pwd)"
-    log_debug "Action path: ${ACTION_PATH:-not set}"
-    
-    # Validate environment
-    validate_environment
+# Immutable script metadata
+readonly SCRIPT_START_TIME="$(date +%s)"
 
-    # Validate inputs
-    validate_inputs
-    # Process inputs
-    local example_input="${INPUT_EXAMPLE_INPUT:-}"
-    local working_directory="${INPUT_WORKING_DIRECTORY:-.}"
-    
-    log_info "Processing input: ${example_input}"
-    
-    # Example processing logic
-    local result
-    result=$(process_example_input "${example_input}")
-    
-    # Calculate execution time
-    local end_time
-    end_time=$(date +%s)
-    local execution_time=$((end_time - START_TIME))
-    
-    # Set outputs
-    set_output "example-output" "${result}"
-    set_output "execution-time" "${execution_time}"
-    
-    log_info "Action completed successfully in ${execution_time} seconds"
-}
+#==============================================================================
+# Function: validate_bash_version
+#==============================================================================
+# Description: Validates that the current Bash version meets minimum requirements
+#              for functional programming features and script compatibility
+#
+# Behavioral Contract:
+#   - Pure function with no side effects
+#   - Immutable parameter handling
+#   - Deterministic output for same inputs
+#   - Comprehensive logging of validation results
+#
+# Parameters:
+#   $1 (required_version) - Minimum required Bash version (format: "X.Y")
+#
+# Returns:
+#   0 - Bash version meets or exceeds requirements
+#   1 - Bash version is below minimum requirements
+#
+# Side Effects:
+#   - Logs debug information about version check
+#   - Logs error if version requirements not met
+#
+# Example Usage:
+#   validate_bash_version "4.4" || exit 2
+#   validate_bash_version "${MIN_BASH_VERSION}"
+#
+# Dependencies:
+#   - log_error, log_debug functions from init.sh
+#   - BASH_VERSION environment variable
+#==============================================================================
+validate_bash_version() {
+    local required_version="$1"
+    local current_version="${BASH_VERSION%%.*}"
 
-# Validate the runtime environment
-validate_environment() {
-    log_debug "Validating environment"
-    
-    # Check required commands
-    local required_commands=("bash" "date" "grep" "sed" "awk")
-    
-    for cmd in "${required_commands[@]}"; do
-        if ! command -v "${cmd}" >/dev/null 2>&1; then
-            log_error "Required command not found: ${cmd}"
-            exit 1
-        fi
-    done
-    
-    # Check GitHub Actions environment
-    if [[ -z "${GITHUB_ACTIONS:-}" ]]; then
-        log_warn "Not running in GitHub Actions environment"
+    if [[ "$current_version" -lt "${required_version%%.*}" ]]; then
+        log_error "compatibility" "Bash version $current_version is below required $required_version"
+        return 1
     fi
-    
-    log_debug "Environment validation completed"
+
+    log_debug "compatibility" "Bash version check passed" "current=${BASH_VERSION},required=${required_version}"
+    return 0
 }
 
-# Process the example input
+#==============================================================================
+# Function: process_example_input
+#==============================================================================
+# Description: Processes user input through a functional pipeline applying
+#              sanitization, trimming, and case transformation
+#
+# Behavioral Contract:
+#   - Pure function with immutable parameter handling
+#   - Input sanitization prevents injection attacks
+#   - Functional composition of string operations
+#   - Comprehensive metrics collection during processing
+#   - Deterministic transformation pipeline
+#
+# Parameters:
+#   $1 (input) - Raw input string to be processed
+#
+# Processing Pipeline:
+#   1. sanitize_input() - Remove potentially harmful characters
+#   2. trim_string()    - Remove leading/trailing whitespace
+#   3. to_uppercase()   - Convert to uppercase for consistency
+#   4. Metrics collection for input/output lengths
+#
+# Returns:
+#   0 - Processing completed successfully
+#   Stdout: Processed string result
+#
+# Side Effects:
+#   - Creates processing metrics via create_metric()
+#   - Logs processing information with metadata
+#
+# Example Usage:
+#   result="$(process_example_input "  Hello World  ")"
+#   # Result: "HELLO WORLD"
+#
+# Dependencies:
+#   - sanitize_input, trim_string, to_uppercase (functional_utils.sh)
+#   - string_length, create_metric (init.sh)
+#   - log_info (init.sh)
+#==============================================================================
 process_example_input() {
     local input="$1"
-    
-    log_debug "Processing example input: ${input}"
-    
-    # Example processing - transform input to uppercase
-    local result
-    result=$(echo "${input}" | tr '[:lower:]' '[:upper:]')
-    
-    log_info "Processed result: ${result}"
-    echo "${result}"
+
+    # Immutable processing pipeline using pure functions
+    local sanitized_input
+    sanitized_input="$(sanitize_input "$input")"
+
+    local trimmed_input
+    trimmed_input="$(trim_string "$sanitized_input")"
+
+    local processed_result
+    processed_result="$(to_uppercase "$trimmed_input")"
+
+    # Add input length metadata
+    local input_length
+    input_length="$(string_length "$input")"
+
+    local result_length
+    result_length="$(string_length "$processed_result")"
+
+    # Create processing metrics
+    create_metric "input_processing_length" "$input_length" "chars" "stage=input"
+    create_metric "input_processing_length" "$result_length" "chars" "stage=output"
+
+    log_info "processing" "Input processed successfully" \
+        "input_length=${input_length},result_length=${result_length}"
+
+    echo "$processed_result"
 }
 
-# Set up error handling
-setup_error_handling() {
-    trap 'handle_error ${LINENO} ${BASH_COMMAND}' ERR
-    trap 'cleanup' EXIT
+#==============================================================================
+# Function: validate_all_inputs
+#==============================================================================
+# Description: Comprehensive validation of all input parameters with detailed
+#              error reporting and behavioral expectations enforcement
+#
+# Behavioral Contract:
+#   - Pure function with immutable parameter validation
+#   - Accumulates all validation errors before reporting
+#   - Non-destructive validation (no parameter modification)
+#   - Comprehensive logging of validation results
+#   - Graceful handling of empty inputs with warnings
+#
+# Parameters:
+#   $1 (example_input)      - User input to validate (may be empty)
+#   $2 (working_directory)  - Directory path for operations
+#   $3 (log_level)          - Logging verbosity level
+#
+# Validation Rules:
+#   - working_directory: Must exist and be accessible
+#   - log_level: Must be one of: debug, info, warn, warning, error
+#   - example_input: Empty values generate warnings, not errors
+#
+# Returns:
+#   0 - All validations passed
+#   1 - One or more validation errors occurred
+#
+# Side Effects:
+#   - Logs validation warnings for empty inputs
+#   - Logs validation errors with error count
+#   - Outputs detailed error messages to stderr
+#
+# Example Usage:
+#   validate_all_inputs "$input" "/tmp" "info" || exit 1
+#   validate_all_inputs "${INPUT_EXAMPLE_INPUT:-}" "${PWD}" "debug"
+#
+# Dependencies:
+#   - validate_directory_accessible (functional_utils.sh)
+#   - to_lowercase (functional_utils.sh)
+#   - log_warn, log_error (init.sh)
+#==============================================================================
+validate_all_inputs() {
+    local example_input="$1"
+    local working_directory="$2"
+    local log_level="$3"
+
+    local validation_errors=()
+
+    # Validate working directory exists and is accessible
+    if ! validate_directory_accessible "$working_directory"; then
+        validation_errors+=("working_directory: Directory not accessible: $working_directory")
+    fi
+
+    # Validate log level is supported
+    case "$(to_lowercase "$log_level")" in
+        debug|info|warn|warning|error)
+            # Valid log level
+            ;;
+        *)
+            validation_errors+=("log_level: Invalid log level '$log_level'")
+            ;;
+    esac
+
+    # Validate example input is not empty (unless explicitly allowed)
+    if [[ -z "$example_input" ]]; then
+        log_warn "validation" "Example input is empty, this may be intentional"
+    fi
+
+    # Check if we have any validation errors
+    if [[ ${#validation_errors[@]} -gt 0 ]]; then
+        log_error "validation" "Input validation failed" \
+            "error_count=${#validation_errors[@]}"
+
+        for error in "${validation_errors[@]}"; do
+            log_error "validation" "$error"
+        done
+
+        return 1
+    fi
+
+    log_info "validation" "All inputs validated successfully"
+    return 0
 }
 
-# Error handler
-handle_error() {
-    local line_number="$1"
-    local command="$2"
-    local exit_code="$?"
-    
-    log_error "Error on line ${line_number}: Command '${command}' failed with exit code ${exit_code}"
-    cleanup
-    exit "${exit_code}"
-}
-
-# Cleanup function
+#==============================================================================
+# Function: cleanup
+#==============================================================================
+# Description: Performs comprehensive cleanup operations with timing metrics
+#              and resource finalization for graceful script termination
+#
+# Behavioral Contract:
+#   - Executes cleanup regardless of script success/failure state
+#   - Calculates and reports total execution time
+#   - Creates final metrics for monitoring systems
+#   - Performs resource cleanup and logging finalization
+#   - Always completes cleanup operations (error-resilient)
+#
+# Parameters:
+#   None (uses global readonly variables)
+#
+# Global Variables Used:
+#   SCRIPT_START_TIME - Initial script timestamp for duration calculation
+#   ACTION_NAME       - Action name for metrics tagging
+#   ACTION_VERSION    - Action version for metrics tagging
+#
+# Operations Performed:
+#   1. Calculate total script execution time
+#   2. Create execution time metrics
+#   3. Log cleanup process with timing information
+#   4. Finalize any pending operations
+#
+# Returns:
+#   Always returns 0 (cleanup should not fail)
+#
+# Side Effects:
+#   - Creates metrics via create_metric()
+#   - Logs cleanup information
+#   - May write to monitoring systems
+#
+# Example Usage:
+#   trap cleanup EXIT  # Automatic cleanup on script exit
+#   cleanup           # Manual cleanup call
+#
+# Dependencies:
+#   - date command for timestamp calculation
+#   - create_metric, log_info (init.sh)
+#   - Global readonly variables (SCRIPT_START_TIME, ACTION_NAME, ACTION_VERSION)
+#==============================================================================
 cleanup() {
-    log_debug "Performing cleanup"
-    # Add any cleanup logic here
+    local cleanup_start_time
+    cleanup_start_time="$(date +%s)"
+
+    log_info "cleanup" "Starting cleanup process"
+
+    # Calculate total execution time
+    local cleanup_end_time total_execution_time
+    cleanup_end_time="$(date +%s)"
+    total_execution_time="$((cleanup_end_time - SCRIPT_START_TIME))"
+
+    # Create final metrics
+    create_metric "script_total_execution_time" "$total_execution_time" "seconds" \
+        "script=${ACTION_NAME},version=${ACTION_VERSION}"
+
+    log_info "cleanup" "Cleanup completed" "cleanup_duration=$((cleanup_end_time - cleanup_start_time))s"
 }
 
-# Initialize error handling
-setup_error_handling
+# Main function with enhanced error handling and functional patterns
+main() {
+    # Initialize script with all enhanced features
+    init_script \
+        "${INPUT_LOG_LEVEL:-info}" \
+        "${INPUT_INCLUDE_SUMMARY:-false}" \
+        "${INPUT_CHECK_RATE_LIMIT:-true}"
 
-# Run main function
+    log_group_start "Executing ${ACTION_NAME} v${ACTION_VERSION}"
+
+    # Validate runtime environment
+    if ! validate_bash_version "$MIN_BASH_VERSION"; then
+        exit 1
+    fi
+
+    # Extract and validate inputs (immutable after extraction)
+    local readonly example_input="${INPUT_EXAMPLE_INPUT:-}"
+    local readonly working_directory="${INPUT_WORKING_DIRECTORY:-.}"
+    local readonly log_level="${INPUT_LOG_LEVEL:-info}"
+
+    log_info "startup" "Action started" \
+        "action=${ACTION_NAME},version=${ACTION_VERSION}"
+
+    # Record inputs in summary if enabled
+    if [[ "${INPUT_INCLUDE_SUMMARY,,}" == "true" ]]; then
+        set_summary_input "example_input" "$example_input"
+        set_summary_input "working_directory" "$working_directory"
+        set_summary_input "log_level" "$log_level"
+        record_event "startup" "Action started" "version=${ACTION_VERSION}"
+    fi
+
+    # Validate all inputs using pure function
+    if ! validate_all_inputs "$example_input" "$working_directory" "$log_level"; then
+        if [[ "${INPUT_INCLUDE_SUMMARY,,}" == "true" ]]; then
+            record_error "validation" "Input validation failed"
+        fi
+        exit 1
+    fi
+
+    # Process input using functional pipeline
+    log_info "processing" "Processing input" "input_length=$(string_length "$example_input")"
+
+    local processing_start_time processing_result processing_end_time processing_duration
+    processing_start_time="$(date +%s)"
+
+    processing_result="$(process_example_input "$example_input")"
+    local processing_exit_code=$?
+
+    processing_end_time="$(date +%s)"
+    processing_duration="$((processing_end_time - processing_start_time))"
+
+    if [[ $processing_exit_code -ne 0 ]]; then
+        log_error "processing" "Input processing failed" "exit_code=${processing_exit_code}"
+        if [[ "${INPUT_INCLUDE_SUMMARY,,}" == "true" ]]; then
+            record_error "processing" "Input processing failed" "exit_code=${processing_exit_code}"
+        fi
+        exit $processing_exit_code
+    fi
+
+    # Create processing metrics
+    create_metric "processing_duration" "$processing_duration" "seconds"
+    create_metric "processing_result_length" "$(string_length "$processing_result")" "chars"
+
+    # Calculate total execution time
+    local script_end_time total_execution_time
+    script_end_time="$(date +%s)"
+    total_execution_time="$((script_end_time - SCRIPT_START_TIME))"
+
+    # Set outputs using immutable values
+    set_output "example-output" "$processing_result"
+    set_output "execution-time" "$total_execution_time"
+    set_output "script-version" "$ACTION_VERSION"
+
+    # Record outputs in summary if enabled
+    if [[ "${INPUT_INCLUDE_SUMMARY,,}" == "true" ]]; then
+        set_summary_output "example_output" "$processing_result"
+        set_summary_output "execution_time" "$total_execution_time"
+        set_summary_output "script_version" "$ACTION_VERSION"
+
+        record_event "completion" "Action completed successfully" \
+            "execution_time=${total_execution_time}s,result_length=$(string_length "$processing_result")"
+
+        # Finalize and output summary
+        finalize_summary "success"
+
+        if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]] && declare -f generate_markdown_summary >/dev/null 2>&1; then
+            local markdown_summary
+            markdown_summary="$(generate_markdown_summary "${ACTION_NAME} v${ACTION_VERSION} Summary")"
+            echo "$markdown_summary" >> "${GITHUB_STEP_SUMMARY}"
+            log_info "summary" "Summary written to GitHub step summary"
+        fi
+    fi
+
+    log_success "completion" "Action completed successfully" \
+        "execution_time=${total_execution_time}s,result=${processing_result}"
+
+
+    log_group_end
+}
+
+# Execute main function with all arguments
 main "$@"

@@ -9,20 +9,20 @@ name: Example Workflow
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   example:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Run Bash Action
-        uses: ./  # Use this if the action is in the same repo
+        uses: ./ # Use this if the action is in the same repo
         # uses: your-username/your-action-repo@v1  # Use this for external actions
         id: bash-action
         with:
@@ -45,15 +45,15 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Target environment'
+        description: "Target environment"
         required: true
-        default: 'staging'
+        default: "staging"
         type: choice
         options:
-        - staging
-        - production
+          - staging
+          - production
       debug:
-        description: 'Enable debug logging'
+        description: "Enable debug logging"
         required: false
         default: false
         type: boolean
@@ -62,7 +62,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: ${{ github.event.inputs.environment }}
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -95,7 +95,7 @@ name: Matrix Example
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   test-matrix:
@@ -114,7 +114,7 @@ jobs:
           - os: ubuntu-latest
             environment: prod
             log-level: warn
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -134,15 +134,15 @@ name: Conditional Example
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
     paths:
-      - 'src/**'
-      - 'scripts/**'
+      - "src/**"
+      - "scripts/**"
 
 jobs:
   conditional:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -180,7 +180,7 @@ jobs:
   error-handling:
     runs-on: ubuntu-latest
     continue-on-error: true
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -221,7 +221,7 @@ on:
 jobs:
   with-secrets:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

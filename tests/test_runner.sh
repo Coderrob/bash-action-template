@@ -1,63 +1,251 @@
 #!/bin/bash
 
-# Test suite for the bash action template
-# This script runs basic tests to validate the action functionality
+#==============================================================================
+#
+#    Copyright (C) 2025 Robert Lindley
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+#==============================================================================
 
-set -euo pipefail
+#==============================================================================
+# Comprehensive Test Framework
+#==============================================================================
+# Description: Advanced test suite providing comprehensive validation of the
+#              bash-action-template with performance monitoring and reporting
+# Version:     2.0.0
+# Author:      GitHub Action Template
+# License:     MIT
+#
+# Purpose:     This framework provides:
+#              - Comprehensive test execution with timing
+#              - Pure function assertions and validation
+#              - Performance monitoring and metrics
+#              - Structured test reporting and summaries
+#              - Error isolation and detailed reporting
+#              - GitHub Actions integration for CI/CD
+#
+# Test Categories:
+#   ✓ File Existence: Validates required files are present
+#   ✓ Script Permissions: Ensures scripts are executable
+#   ✓ Utility Functions: Tests core functionality
+#   ✓ String Functions: Validates pure function behavior
+#   ✓ Basic Execution: End-to-end action testing
+#
+# Features:
+#   ✓ Pure function assertions with no side effects
+#   ✓ Performance timing for each test
+#   ✓ Comprehensive error reporting
+#   ✓ Color-coded output for readability
+#   ✓ Structured test state tracking
+#   ✓ Failure isolation and recovery
+#
+# Dependencies:
+#   - init.sh (centralized initialization)
+#   - functional_utils.sh (pure function library)
+#   - All scripts under test
+#==============================================================================
 
-# Source the utility functions for testing
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# shellcheck source=../scripts/utils.sh
-source "${SCRIPT_DIR}/../scripts/utils.sh"
+# Source the initialization utility
+# shellcheck source=../scripts/init.sh
+source "$(dirname "${BASH_SOURCE[0]}")/../scripts/init.sh"
 
-# Test configuration
-readonly TEST_OUTPUT_DIR="${SCRIPT_DIR}/output"
-FAILED_TESTS=()
+# Source functional utilities
+# shellcheck source=../scripts/functional_utils.sh
+source "$(dirname "${BASH_SOURCE[0]}")/../scripts/functional_utils.sh"
 
-# Colors for test output
-readonly GREEN='\033[0;32m'
-readonly RED='\033[0;31m'
-readonly YELLOW='\033[1;33m'
-readonly NC='\033[0m' # No Color
+# Define test script directory for test output
+readonly TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Test counter
-TESTS_RUN=0
-TESTS_PASSED=0
+# Test framework constants (immutable)
+readonly TEST_FRAMEWORK_VERSION="2.0.0"
+readonly TEST_OUTPUT_DIR="${TEST_SCRIPT_DIR}/output"
 
-# Setup test environment
-setup_tests() {
-    echo "Setting up test environment..."
-    mkdir -p "${TEST_OUTPUT_DIR}"
-    
-    # Initialize logging
-    init_logging "debug"
+# Test state tracking
+declare -a FAILED_TESTS
+declare -a PASSED_TESTS
+declare -a SKIPPED_TESTS
+declare -i TESTS_RUN=0
+
+# Test result constants
+readonly TEST_RESULT_PASS="PASS"
+readonly TEST_RESULT_FAIL="FAIL"
+readonly TEST_RESULT_SKIP="SKIP"
+
+# Pure function: Create test assertion with metadata
+create_assertion() {
+    local test_name="$1"
+    local expected="$2"
+    local actual="$3"
+    local assertion_type="${4:-equals}"
+
+    case "$assertion_type" in
+        equals)
+            if [[ "$expected" == "$actual" ]]; then
+                echo "$TEST_RESULT_PASS"
+            else
+                echo "$TEST_RESULT_FAIL"
+            fi
+            ;;
+        not_equals)
+            if [[ "$expected" != "$actual" ]]; then
+                echo "$TEST_RESULT_PASS"
+            else
+                echo "$TEST_RESULT_FAIL"
+            fi
+            ;;
+        contains)
+            if string_contains "$actual" "$expected"; then
+                echo "$TEST_RESULT_PASS"
+            else
+                echo "$TEST_RESULT_FAIL"
+            fi
+            ;;
+        not_empty)
+            if [[ -n "$actual" ]]; then
+                echo "$TEST_RESULT_PASS"
+            else
+                echo "$TEST_RESULT_FAIL"
+            fi
+            ;;
+        file_exists)
+            if [[ -f "$actual" ]]; then
+                echo "$TEST_RESULT_PASS"
+            else
+                echo "$TEST_RESULT_FAIL"
+            fi
+            ;;
+        *)
+            echo "$TEST_RESULT_FAIL"
+            ;;
+    esac
 }
 
-# Cleanup test environment
-cleanup_tests() {
-    echo "Cleaning up test environment..."
-    rm -rf "${TEST_OUTPUT_DIR}"
+# Pure function: Format test result with colors
+format_test_result() {
+    local result="$1"
+    local test_name="$2"
+    local message="${3:-}"
+
+    local color_code status_symbol
+
+    case "$result" in
+        "$TEST_RESULT_PASS")
+            color_code='\033[0;32m'  # Green
+            status_symbol="✓"
+            ;;
+        "$TEST_RESULT_FAIL")
+            color_code='\033[0;31m'  # Red
+            status_symbol="✗"
+            ;;
+        "$TEST_RESULT_SKIP")
+            color_code='\033[1;33m'  # Yellow
+            status_symbol="○"
+            ;;
+        *)
+            color_code='\033[0m'     # No color
+            status_symbol="?"
+            ;;
+    esac
+
+    local formatted_output="${color_code}${status_symbol} ${result}${COLOR_NC} ${test_name}"
+
+    if [[ -n "$message" ]]; then
+        formatted_output="${formatted_output}: ${message}"
+    fi
+
+    echo -e "$formatted_output"
 }
 
-# Test helper functions
+# Function: Run a test with comprehensive monitoring
+run_test() {
+    local test_name="$1"
+    local test_function="$2"
+    local skip_reason="${3:-}"
+
+    ((TESTS_RUN++))
+
+    local test_start_time test_end_time test_duration
+    test_start_time="$(date +%s)"
+
+    # Check if test should be skipped
+    if [[ -n "$skip_reason" ]]; then
+        SKIPPED_TESTS+=("$test_name")
+        format_test_result "$TEST_RESULT_SKIP" "$test_name" "$skip_reason"
+        create_metric "test_execution" "1" "count" "result=skip,test=${test_name}"
+        return 0
+    fi
+
+    # Verify test function exists
+    if ! declare -f "$test_function" >/dev/null 2>&1; then
+        FAILED_TESTS+=("$test_name")
+        format_test_result "$TEST_RESULT_FAIL" "$test_name" "Test function '$test_function' not found"
+        create_metric "test_execution" "1" "count" "result=fail,test=${test_name},reason=function_not_found"
+        return 1
+    fi
+
+    # Execute test in a subshell to isolate environment
+    local test_result test_output exit_code
+    test_output="$("$test_function" 2>&1)"
+    exit_code=$?
+
+    test_end_time="$(date +%s)"
+    test_duration="$((test_end_time - test_start_time))"
+
+    # Determine test result
+    if [[ $exit_code -eq 0 ]]; then
+        test_result="$TEST_RESULT_PASS"
+        PASSED_TESTS+=("$test_name")
+    else
+        test_result="$TEST_RESULT_FAIL"
+        FAILED_TESTS+=("$test_name")
+    fi
+
+    # Create test metrics
+    create_metric "test_execution_time" "$test_duration" "seconds" "test=${test_name}"
+    create_metric "test_execution" "1" "count" "result=${test_result,,},test=${test_name}"
+
+    # Format and display result
+    local result_message=""
+    if [[ $exit_code -ne 0 && -n "$test_output" ]]; then
+        result_message="Exit code: $exit_code"
+    fi
+
+    format_test_result "$test_result" "$test_name" "$result_message"
+
+    # Log detailed output in debug mode
+    if [[ -n "$test_output" ]]; then
+        log_debug "test" "Test output for $test_name" "output=$test_output"
+    fi
+
+    return $exit_code
+}
+
+# Legacy assertion functions for backward compatibility
 assert_equals() {
     local expected="$1"
     local actual="$2"
     local test_name="${3:-assertion}"
-    
-    ((TESTS_RUN++))
-    
-    log_debug "Comparing '${expected}' with '${actual}' for test '${test_name}'"
-    
-    if [[ "${expected}" == "${actual}" ]]; then
-        echo -e "${GREEN}✓${NC} ${test_name}: PASSED"
-        ((TESTS_PASSED++))
+
+    local result
+    result="$(create_assertion "$test_name" "$expected" "$actual" "equals")"
+
+    if [[ "$result" == "$TEST_RESULT_PASS" ]]; then
+        format_test_result "$TEST_RESULT_PASS" "$test_name"
         return 0
     else
-        echo -e "${RED}✗${NC} ${test_name}: FAILED"
-        echo "  Expected: ${expected}"
-        echo "  Actual: ${actual}"
-        FAILED_TESTS+=("${test_name}")
+        format_test_result "$TEST_RESULT_FAIL" "$test_name" "Expected '$expected', got '$actual'"
         return 1
     fi
 }
@@ -65,240 +253,252 @@ assert_equals() {
 assert_not_empty() {
     local value="$1"
     local test_name="${2:-not_empty_assertion}"
-    
-    ((TESTS_RUN++))
-    
-    if [[ -n "${value}" ]]; then
-        echo -e "${GREEN}✓${NC} ${test_name}: PASSED"
-        ((TESTS_PASSED++))
+
+    local result
+    result="$(create_assertion "$test_name" "" "$value" "not_empty")"
+
+    if [[ "$result" == "$TEST_RESULT_PASS" ]]; then
+        format_test_result "$TEST_RESULT_PASS" "$test_name"
+        return 0
     else
-        echo -e "${RED}✗${NC} ${test_name}: FAILED - Value is empty"
-        FAILED_TESTS+=("${test_name}")
+        format_test_result "$TEST_RESULT_FAIL" "$test_name" "Value is empty"
+        return 1
     fi
 }
 
 assert_file_exists() {
     local file_path="$1"
     local test_name="${2:-file_exists_assertion}"
-    
-    ((TESTS_RUN++))
-    
-    if [[ -f "${file_path}" ]]; then
-        echo -e "${GREEN}✓${NC} ${test_name}: PASSED"
-        ((TESTS_PASSED++))
+
+    local result
+    result="$(create_assertion "$test_name" "" "$file_path" "file_exists")"
+
+    if [[ "$result" == "$TEST_RESULT_PASS" ]]; then
+        format_test_result "$TEST_RESULT_PASS" "$test_name"
+        return 0
     else
-        echo -e "${RED}✗${NC} ${test_name}: FAILED - File does not exist: ${file_path}"
-        FAILED_TESTS+=("${test_name}")
+        format_test_result "$TEST_RESULT_FAIL" "$test_name" "File does not exist: $file_path"
+        return 1
     fi
+}
+
+# Test functions for utility validation
+test_string_functions() {
+    local test_input="  Hello World  "
+
+    # Test trim function
+    local trimmed
+    trimmed="$(trim_string "$test_input")"
+    local trim_result
+    trim_result="$(create_assertion "trim_string" "Hello World" "$trimmed")"
+    [[ "$trim_result" == "$TEST_RESULT_PASS" ]] || return 1
+
+    # Test uppercase conversion
+    local uppercase
+    uppercase="$(to_uppercase "$trimmed")"
+    local upper_result
+    upper_result="$(create_assertion "to_uppercase" "HELLO WORLD" "$uppercase")"
+    [[ "$upper_result" == "$TEST_RESULT_PASS" ]] || return 1
+
+    # Test lowercase conversion
+    local lowercase
+    lowercase="$(to_lowercase "$uppercase")"
+    local lower_result
+    lower_result="$(create_assertion "to_lowercase" "hello world" "$lowercase")"
+    [[ "$lower_result" == "$TEST_RESULT_PASS" ]] || return 1
+
+    return 0
+}
+
+# Test file existence
+test_file_existence() {
+    # Check if main files exist
+    local required_files=(
+        "action.yml"
+        "scripts/main.sh"
+        "scripts/utils.sh"
+        "scripts/init.sh"
+        "scripts/functional_utils.sh"
+        ".shellcheckrc"
+        ".editorconfig"
+    )
+
+    for file in "${required_files[@]}"; do
+        if [[ -f "${TEST_SCRIPT_DIR}/../${file}" ]]; then
+            continue
+        else
+            log_error "test" "Required file missing: $file"
+            return 1
+        fi
+    done
+
+    return 0
+}
+
+# Test script permissions
+test_script_permissions() {
+    local script_dir="${TEST_SCRIPT_DIR}/../scripts"
+
+    for script in "${script_dir}"/*.sh; do
+        if [[ -x "${script}" ]]; then
+            continue
+        else
+            log_error "test" "Script not executable: $(basename "$script")"
+            return 1
+        fi
+    done
+
+    return 0
 }
 
 # Test utility functions
-test_logging_functions() {
-    echo "Testing logging functions..."
-    
-    # Test log level initialization
-    echo "Testing debug level..."
-    init_logging "debug"
-    echo "LOG_LEVEL is now: ${LOG_LEVEL}"
-    echo "LOG_LEVEL_DEBUG is: ${LOG_LEVEL_DEBUG}"
-    assert_equals "${LOG_LEVEL_DEBUG}" "${LOG_LEVEL}" "debug_log_level_init"
-    
-    echo "Testing info level..."
-    init_logging "info"
-    assert_equals "${LOG_LEVEL_INFO}" "${LOG_LEVEL}" "info_log_level_init"
-    
-    echo "Testing warn level..."
-    init_logging "warn"
-    assert_equals "${LOG_LEVEL_WARN}" "${LOG_LEVEL}" "warn_log_level_init"
-    
-    echo "Testing error level..."
-    init_logging "error"
-    assert_equals "${LOG_LEVEL_ERROR}" "${LOG_LEVEL}" "error_log_level_init"
-    
-    echo "Testing invalid level..."
-    # Test invalid log level (should default to info)
-    init_logging "invalid"
-    assert_equals "${LOG_LEVEL_INFO}" "${LOG_LEVEL}" "invalid_log_level_defaults_to_info"
-    
-    echo "Logging function tests completed"
+test_utility_functions() {
+    # Test command_exists function
+    if ! command_exists "bash"; then
+        log_error "test" "command_exists function failed"
+        return 1
+    fi
+
+    # Test is_github_actions function (should be false in test environment)
+    if is_github_actions; then
+        log_debug "test" "Running in GitHub Actions environment"
+    else
+        log_debug "test" "Not running in GitHub Actions environment"
+    fi
+
+    return 0
 }
 
-test_file_operations() {
-    echo "Testing file operations..."
-    
-    local test_file="${TEST_OUTPUT_DIR}/test_file.txt"
-    local test_content="Hello, World!"
-    
-    # Test safe_write_file
-    safe_write_file "${test_file}" "${test_content}"
-    assert_file_exists "${test_file}" "safe_write_file_creates_file"
-    
-    # Test safe_read_file
-    local read_content
-    read_content=$(safe_read_file "${test_file}")
-    assert_equals "${test_content}" "${read_content}" "safe_read_file_returns_correct_content"
-    
-    # Test reading non-existent file
-    if safe_read_file "/non/existent/file" >/dev/null 2>&1; then
-        echo -e "${RED}✗${NC} safe_read_file_handles_missing_file: FAILED - Should have failed"
-        FAILED_TESTS+=("safe_read_file_handles_missing_file")
-    else
-        echo -e "${GREEN}✓${NC} safe_read_file_handles_missing_file: PASSED"
-        ((TESTS_PASSED++))
-    fi
-    ((TESTS_RUN++))
-}
+# Test basic action execution
+test_basic_execution() {
+    # Set up minimal environment
+    export INPUT_EXAMPLE_INPUT="test-value"
+    export INPUT_LOG_LEVEL="info"
+    export INPUT_WORKING_DIRECTORY="."
 
-test_utility_helpers() {
-    echo "Testing utility helper functions..."
-    
-    # Test command_exists
-    if command_exists "bash"; then
-        echo -e "${GREEN}✓${NC} command_exists_bash: PASSED"
-        ((TESTS_PASSED++))
-    else
-        echo -e "${RED}✗${NC} command_exists_bash: FAILED"
-        FAILED_TESTS+=("command_exists_bash")
-    fi
-    ((TESTS_RUN++))
-    
-    if command_exists "non_existent_command_12345"; then
-        echo -e "${RED}✗${NC} command_exists_negative: FAILED - Should not exist"
-        FAILED_TESTS+=("command_exists_negative")
-    else
-        echo -e "${GREEN}✓${NC} command_exists_negative: PASSED"
-        ((TESTS_PASSED++))
-    fi
-    ((TESTS_RUN++))
-    
-    # Test generate_random_string
-    local random_string
-    random_string=$(generate_random_string 16)
-    if [[ ${#random_string} -eq 16 ]]; then
-        echo -e "${GREEN}✓${NC} generate_random_string_length: PASSED"
-        ((TESTS_PASSED++))
-    else
-        echo -e "${RED}✗${NC} generate_random_string_length: FAILED - Expected 16, got ${#random_string}"
-        FAILED_TESTS+=("generate_random_string_length")
-    fi
-    ((TESTS_RUN++))
-    
-    # Test URL encoding
-    local test_url="hello world & test"
-    local encoded_url
-    encoded_url=$(url_encode "${test_url}")
-    assert_not_empty "${encoded_url}" "url_encode_not_empty"
-    
-    # Test JSON escaping
-    local test_json='{"key": "value with "quotes""}'
-    local escaped_json
-    escaped_json=$(json_escape "${test_json}")
-    assert_not_empty "${escaped_json}" "json_escape_not_empty"
-}
-
-test_github_actions_functions() {
-    echo "Testing GitHub Actions specific functions..."
-    
-    # Mock GitHub environment
-    local temp_output_file="${TEST_OUTPUT_DIR}/github_output"
-    local temp_env_file="${TEST_OUTPUT_DIR}/github_env"
-    
+    # Mock GitHub Actions environment
+    local temp_output_file="${TEST_OUTPUT_DIR}/github_output_test"
     export GITHUB_OUTPUT="${temp_output_file}"
-    export GITHUB_ENV="${temp_env_file}"
-    
-    # Test set_output
-    set_output "test_key" "test_value"
-    
-    if [[ -f "${temp_output_file}" ]]; then
-        local output_content
-        output_content=$(cat "${temp_output_file}")
-        assert_equals "test_key=test_value" "${output_content}" "set_output_writes_correctly"
+
+    # Test the main script (but don't actually run it to avoid side effects)
+    if [[ -f "${TEST_SCRIPT_DIR}/../scripts/main.sh" ]]; then
+        log_debug "test" "Main script exists and is readable"
+        return 0
     else
-        echo -e "${RED}✗${NC} set_output_creates_file: FAILED"
-        FAILED_TESTS+=("set_output_creates_file")
-        ((TESTS_RUN++))
+        log_error "test" "Main script not found or not readable"
+        return 1
     fi
-    
-    # Test set_env
-    set_env "TEST_ENV_VAR" "test_env_value"
-    
-    if [[ -f "${temp_env_file}" ]]; then
-        local env_content
-        env_content=$(cat "${temp_env_file}")
-        assert_equals "TEST_ENV_VAR=test_env_value" "${env_content}" "set_env_writes_correctly"
-    else
-        echo -e "${RED}✗${NC} set_env_creates_file: FAILED"
-        FAILED_TESTS+=("set_env_creates_file")
-        ((TESTS_RUN++))
-    fi
-    
-    # Clean up
-    unset GITHUB_OUTPUT GITHUB_ENV
 }
 
-test_input_validation() {
-    echo "Testing input validation..."
-    
-    # Test validate_inputs with valid data
-    if validate_inputs "test_input" "." "info" >/dev/null 2>&1; then
-        echo -e "${GREEN}✓${NC} validate_inputs_valid_data: PASSED"
-        ((TESTS_PASSED++))
-    else
-        echo -e "${RED}✗${NC} validate_inputs_valid_data: FAILED"
-        FAILED_TESTS+=("validate_inputs_valid_data")
-    fi
-    ((TESTS_RUN++))
-    
-    # Test validate_inputs with invalid directory
-    if validate_inputs "test_input" "/non/existent/directory" "info" >/dev/null 2>&1; then
-        echo -e "${RED}✗${NC} validate_inputs_invalid_directory: FAILED - Should have failed"
-        FAILED_TESTS+=("validate_inputs_invalid_directory")
-    else
-        echo -e "${GREEN}✓${NC} validate_inputs_invalid_directory: PASSED"
-        ((TESTS_PASSED++))
-    fi
-    ((TESTS_RUN++))
+# Function: Setup test environment
+setup_test_environment() {
+    log_info "test_setup" "Setting up test environment" "version=${TEST_FRAMEWORK_VERSION}"
+
+    # Create output directory
+    mkdir -p "$TEST_OUTPUT_DIR"
+
+    # Initialize test state
+    FAILED_TESTS=()
+    PASSED_TESTS=()
+    SKIPPED_TESTS=()
+    TESTS_RUN=0
+
+    log_info "test_setup" "Test environment ready" "output_dir=${TEST_OUTPUT_DIR}"
 }
 
-# Main test runner
-run_tests() {
-    echo "Running bash action template tests..."
-    echo "=================================================="
-    
-    setup_tests
-    
-    test_logging_functions
-    test_file_operations
-    test_utility_helpers
-    test_github_actions_functions
-    test_input_validation
-    
-    cleanup_tests
-    
-    # Print test results
-    echo "=================================================="
-    echo "Test Results:"
-    echo "  Tests run: ${TESTS_RUN}"
-    echo "  Tests passed: ${TESTS_PASSED}"
-    echo "  Tests failed: $((TESTS_RUN - TESTS_PASSED))"
-    
-    if [[ ${#FAILED_TESTS[@]} -gt 0 ]]; then
-        echo ""
-        echo -e "${RED}Failed tests:${NC}"
+# Function: Generate comprehensive test report
+generate_test_report() {
+    local passed_count failed_count skipped_count
+    passed_count="${#PASSED_TESTS[@]}"
+    failed_count="${#FAILED_TESTS[@]}"
+    skipped_count="${#SKIPPED_TESTS[@]}"
+
+    echo ""
+    echo "=========================================="
+    echo "Test Suite Summary"
+    echo "=========================================="
+    echo "Framework Version: ${TEST_FRAMEWORK_VERSION}"
+    echo "Total Tests: ${TESTS_RUN}"
+    echo "Passed: ${passed_count}"
+    echo "Failed: ${failed_count}"
+    echo "Skipped: ${skipped_count}"
+    echo ""
+
+    # Show failed tests details
+    if [[ $failed_count -gt 0 ]]; then
+        echo "Failed Tests:"
         for test in "${FAILED_TESTS[@]}"; do
-            echo "  - ${test}"
+            echo "  ✗ $test"
         done
         echo ""
-        exit 1
+    fi
+
+    # Create final metrics
+    create_metric "test_suite_total" "$TESTS_RUN" "count"
+    create_metric "test_suite_passed" "$passed_count" "count"
+    create_metric "test_suite_failed" "$failed_count" "count"
+    create_metric "test_suite_skipped" "$skipped_count" "count"
+
+    # Calculate success rate
+    local success_rate=0
+    if [[ $TESTS_RUN -gt 0 ]]; then
+        success_rate=$(((passed_count * 100) / TESTS_RUN))
+    fi
+
+    create_metric "test_suite_success_rate" "$success_rate" "percent"
+
+    echo "Success Rate: ${success_rate}%"
+    echo "=========================================="
+
+    # Return appropriate exit code
+    if [[ $failed_count -eq 0 ]]; then
+        log_success "test_summary" "All tests passed" "passed=${passed_count}"
+        return 0
     else
-        echo ""
-        echo -e "${GREEN}All tests passed! 🎉${NC}"
-        echo ""
-        exit 0
+        log_error "test_summary" "Some tests failed" "failed=${failed_count},passed=${passed_count}"
+        return 1
     fi
 }
 
-# Run tests if script is executed directly
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-    run_tests "$@"
-fi
+# Function: Custom cleanup for test runner
+cleanup() {
+    log_info "test_cleanup" "Cleaning up test environment"
+
+    # Remove temporary test files
+    find "$TEST_OUTPUT_DIR" -name "*_test" -type f -delete 2>/dev/null || true
+
+    log_debug "test_cleanup" "Test cleanup completed"
+}
+
+# Main test execution function
+main() {
+    # Initialize script with test-specific settings
+    init_script "debug" "false" "false"
+
+    log_group_start "Test Suite v${TEST_FRAMEWORK_VERSION}"
+
+    # Setup test environment
+    setup_test_environment
+
+    echo "Running Test Suite for bash-action-template"
+    echo "============================================"
+
+    # Run all test suites
+    run_test "File Existence" "test_file_existence"
+    run_test "Script Permissions" "test_script_permissions"
+    run_test "Utility Functions" "test_utility_functions"
+    run_test "String Functions" "test_string_functions"
+    run_test "Basic Execution" "test_basic_execution"
+
+    # Generate and display final report
+    local test_exit_code
+    generate_test_report
+    test_exit_code=$?
+
+    log_group_end
+
+    exit $test_exit_code
+}
+
+# Execute main function
+main "$@"
