@@ -302,7 +302,8 @@ generate_random_string() {
     local length="${1:-32}"
     
     if command_exists openssl; then
-        openssl rand -hex $((length / 2)) 2>/dev/null
+        # Ensure enough bytes for odd lengths, then trim to exact length
+        openssl rand -hex $(((length + 1) / 2)) 2>/dev/null | head -c "${length}"
     elif [[ -r /dev/urandom ]]; then
         tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c "${length}"
     else
