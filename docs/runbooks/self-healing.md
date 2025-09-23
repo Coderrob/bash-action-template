@@ -138,7 +138,7 @@ bash health-check.sh
 
 ## Automated Fixes
 
-### Permission Auto-Fix
+### Permission Autofix
 
 ```bash
 # Automatically fix script permissions
@@ -181,7 +181,7 @@ else
 fi
 ```
 
-### Code Formatting Auto-Fix
+### Code Formatting Autofix
 
 ```bash
 # Auto-format shell scripts
@@ -217,9 +217,9 @@ fi
 
 # Step 2: Apply automatic fixes
 echo "Step 2: Applying automatic fixes..."
-bash auto-fix-permissions.sh
-bash auto-install-deps.sh
-bash auto-format-code.sh
+bash autofix-permissions.sh
+bash autoinstall-deps.sh
+bash autoformat-code.sh
 
 # Step 3: Re-run health check
 echo "Step 3: Re-running health check..."

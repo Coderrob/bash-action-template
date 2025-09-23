@@ -31,8 +31,8 @@ format: check-tools ## Check shell script formatting with shfmt and prettier
 		echo "prettier not installed. Run 'make install-tools' first."; \
 	fi
 
-format-fix: check-tools ## Auto-fix shell script formatting and prettier formatting
-	@echo "Auto-fixing shell script formatting..."
+format-fix: check-tools ## Autofix shell script formatting and prettier formatting
+	@echo "Autofixing shell script formatting..."
 	@if command -v shfmt >/dev/null 2>&1; then \
 		find . -name "*.sh" -type f | xargs shfmt -l -w; \
 		echo "Shell formatting applied."; \
@@ -40,7 +40,7 @@ format-fix: check-tools ## Auto-fix shell script formatting and prettier formatt
 		echo "shfmt not installed. Run 'make install-tools' first."; \
 		exit 1; \
 	fi
-	@echo "Auto-fixing markdown/yaml formatting..."
+	@echo "Autofixing markdown/yaml formatting..."
 	@if command -v prettier >/dev/null 2>&1; then \
 		prettier --write "**/*.{md,yml,yaml}" --ignore-path .gitignore; \
 		echo "Prettier formatting applied."; \

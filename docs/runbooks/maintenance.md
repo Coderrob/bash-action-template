@@ -218,7 +218,7 @@ fi
 # Reinstall missing dependencies (if possible)
 # Add dependency auto-installation logic here
 
-echo "Auto-fixes applied"
+echo "Autofixes applied"
 ```
 
 ## Maintenance Checklist
