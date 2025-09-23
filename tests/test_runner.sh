@@ -91,6 +91,7 @@ readonly TEST_RESULT_FAIL="FAIL"
 readonly TEST_RESULT_SKIP="SKIP"
 
 # Pure function: Create test assertion with metadata
+# shellcheck disable=SC2317
 create_assertion() {
     local test_name="$1"
     local expected="$2"
@@ -248,6 +249,7 @@ run_test() {
 }
 
 # Legacy assertion functions for backward compatibility
+# shellcheck disable=SC2317
 assert_equals() {
     local expected="$1"
     local actual="$2"
@@ -265,6 +267,7 @@ assert_equals() {
     fi
 }
 
+# shellcheck disable=SC2317
 assert_not_empty() {
     local value="$1"
     local test_name="${2:-not_empty_assertion}"
@@ -281,6 +284,7 @@ assert_not_empty() {
     fi
 }
 
+# shellcheck disable=SC2317
 assert_file_exists() {
     local file_path="$1"
     local test_name="${2:-file_exists_assertion}"
@@ -298,6 +302,7 @@ assert_file_exists() {
 }
 
 # Test functions for utility validation
+# shellcheck disable=SC2317
 test_string_functions() {
     local test_input="  Hello World  "
 
@@ -326,6 +331,7 @@ test_string_functions() {
 }
 
 # Test file existence
+# shellcheck disable=SC2317
 test_file_existence() {
     # Check if main files exist
     local required_files=(
@@ -353,6 +359,7 @@ test_file_existence() {
 }
 
 # Test script permissions
+# shellcheck disable=SC2317
 test_script_permissions() {
     local script_dir="${TEST_SCRIPT_DIR}/../scripts"
 
@@ -370,6 +377,7 @@ test_script_permissions() {
 }
 
 # Test utility functions
+# shellcheck disable=SC2317
 test_utility_functions() {
     # Test command_exists function
     if ! command_exists "bash"; then
@@ -388,6 +396,7 @@ test_utility_functions() {
 }
 
 # Test basic action execution
+# shellcheck disable=SC2317
 test_basic_execution() {
     # Set up minimal environment
     export INPUT_EXAMPLE_INPUT="test-value"
@@ -446,7 +455,7 @@ generate_test_report() {
     if [[ ${failed_count} -gt 0 ]]; then
         echo "Failed Tests:"
         for test in "${FAILED_TESTS[@]}"; do
-            echo "  ✗ $test"
+            echo "  ✗ ${test}"
         done
         echo ""
     fi
