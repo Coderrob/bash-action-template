@@ -83,6 +83,12 @@ validate: ## Validate action.yml and required files
 	@test -x scripts/services/main.sh && echo "✓ scripts/services/main.sh is executable"
 	@test -f scripts/lib/utils.sh && echo "✓ scripts/lib/utils.sh exists"
 	@test -x scripts/lib/utils.sh && echo "✓ scripts/lib/utils.sh is executable"
+	@find scripts -name "*.sh" -type f | while read -r script; do \
+		test -x "$$script" || (echo "✗ $$script is not executable"; exit 1); \
+	done && echo "✓ All scripts in scripts/ are executable"
+	@find tests -name "*.sh" -type f | while read -r script; do \
+		test -x "$$script" || (echo "✗ $$script is not executable"; exit 1); \
+	done && echo "✓ All scripts in tests/ are executable"
 	@test -f .shellcheckrc && echo "✓ .shellcheckrc exists"
 	@test -f .editorconfig && echo "✓ .editorconfig exists"
 	@test -f .github/workflows/ci.yml && echo "✓ CI workflow exists"
@@ -189,8 +195,8 @@ clean: ## Clean up temporary files and test artifacts
 
 permissions: ## Fix script permissions
 	@echo "Setting correct permissions..."
-	@chmod +x scripts/*.sh
-	@chmod +x tests/*.sh
+	@find scripts -name "*.sh" -type f -exec chmod +x {} \;
+	@find tests -name "*.sh" -type f -exec chmod +x {} \;
 	@echo "Permissions updated"
 
 # Integration testing with act (GitHub Actions simulator)

@@ -24,7 +24,8 @@ set -euo pipefail
 echo "Setting up development environment..."
 
 # Make scripts executable
-chmod +x scripts/*.sh
+find scripts -name "*.sh" -type f -exec chmod +x {} \;
+find tests -name "*.sh" -type f -exec chmod +x {} \;
 
 # Install pre-commit hooks if .pre-commit-config.yaml exists
 if [[ -f ".pre-commit-config.yaml" ]]; then
