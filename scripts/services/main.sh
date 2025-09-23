@@ -164,8 +164,8 @@ validate_bash_version() {
     local required_version="$1"
     local current_version="${BASH_VERSION%%.*}"
 
-    if [[ "$current_version" -lt "${required_version%%.*}" ]]; then
-        log_error "compatibility" "Bash version $current_version is below required $required_version"
+    if [[ "${current_version}" -lt "${required_version%%.*}" ]]; then
+        log_error "compatibility" "Bash version ${current_version} is below required ${required_version}"
         return 1
     fi
 
@@ -217,20 +217,20 @@ process_example_input() {
 
     # Immutable processing pipeline using pure functions
     local sanitized_input
-    sanitized_input="$(sanitize_input "$input")"
+    sanitized_input="$(sanitize_input "${input}")"
 
     local trimmed_input
-    trimmed_input="$(trim_string "$sanitized_input")"
+    trimmed_input="$(trim_string "${sanitized_input}")"
 
     local processed_result
-    processed_result="$(to_uppercase "$trimmed_input")"
+    processed_result="$(to_uppercase "${trimmed_input}")"
 
     # Add input length metadata
     local input_length
-    input_length="$(string_length "$input")"
+    input_length="$(string_length "${input}")"
 
     local result_length
-    result_length="$(string_length "$processed_result")"
+    result_length="$(string_length "${processed_result}")"
 
     # Create processing metrics
     create_metric "input_processing_length" "${input_length}" "chars" "stage=input"

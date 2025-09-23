@@ -359,6 +359,50 @@ validate_in_list() {
     return "${EXIT_INVALID_ARGS}"
 }
 
+# Validate all inputs for the action
+validate_inputs() {
+    local example_input="$1"
+    local working_directory="$2"
+    local log_level="$3"
+
+    local validation_errors=()
+
+    # Validate working directory exists and is accessible
+    if ! validate_directory_exists "${working_directory}"; then
+        validation_errors+=("working_directory: Directory not accessible: ${working_directory}")
+    fi
+
+    # Validate log level is supported
+    case "$(to_lowercase "${log_level}")" in
+    debug | info | warn | warning | error)
+        # Valid log level
+        ;;
+    *)
+        validation_errors+=("log_level: Invalid log level '${log_level}'")
+        ;;
+    esac
+
+    # Validate example input is not empty (unless explicitly allowed)
+    if [[ -z "${example_input}" ]]; then
+        log_warn "validation" "Example input is empty, this may be intentional"
+    fi
+
+    # Check if we have any validation errors
+    if [[ ${#validation_errors[@]} -gt 0 ]]; then
+        log_error "validation" "Input validation failed" \
+            "error_count=${#validation_errors[@]}"
+
+        for error in "${validation_errors[@]}"; do
+            log_error "validation" "${error}"
+        done
+
+        return 1
+    fi
+
+    log_info "validation" "All inputs validated successfully"
+    return 0
+}
+
 #==============================================================================
 # Export Functions for Use in Other Scripts
 #==============================================================================
@@ -373,3 +417,4 @@ export -f validate_directory_exists
 export -f trim_string
 export -f to_uppercase
 export -f to_lowercase
+export -f validate_inputs
