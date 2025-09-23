@@ -197,8 +197,8 @@ jobs:
             "action.yml"
             "README.md"
             "LICENSE"
-            "scripts/main.sh"
-            "scripts/utils.sh"
+            "scripts/services/main.sh"
+            "scripts/lib/utils.sh"
           )
 
           for file in "${required_files[@]}"; do

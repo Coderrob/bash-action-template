@@ -205,7 +205,11 @@ run_test() {
     local test_result test_output exit_code
     local temp_output="/tmp/test_output_$$"
     local exit_file="/tmp/exit_code_$$"
-    (set +e; eval "$test_function > \"$temp_output\" 2>&1"; echo $? > "$exit_file") 2>/dev/null
+    (
+        set +e
+        eval "$test_function > \"$temp_output\" 2>&1"
+        echo $? >"$exit_file"
+    ) 2>/dev/null
     exit_code="$(cat "$exit_file")"
     test_output="$(cat "$temp_output")"
     rm -f "$temp_output" "$exit_file"

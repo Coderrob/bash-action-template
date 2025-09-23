@@ -44,7 +44,7 @@ runs:
       shell: bash
       run: |
         echo "::group::Validating inputs"
-        source "${{ github.action_path }}/scripts/utils.sh"
+        source "${{ github.action_path }}/scripts/lib/utils.sh"
         validate_inputs "${{ inputs.example-input }}" "${{ inputs.working-directory }}" "${{ inputs.log-level }}"
         echo "::endgroup::"
 
@@ -61,7 +61,7 @@ runs:
         ACTION_PATH: ${{ github.action_path }}
       run: |
         echo "::group::Executing main script"
-        "${{ github.action_path }}/scripts/main.sh"
+        "${{ github.action_path }}/scripts/services/main.sh"
         echo "::endgroup::"
 
 branding:

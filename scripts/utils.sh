@@ -58,8 +58,8 @@
 set -euo pipefail
 
 # Source core library for shared functionality and constants
-# shellcheck source=./core.sh
-source "$(dirname "${BASH_SOURCE[0]}")/core.sh"
+# shellcheck source=./lib/core.sh
+source "$(dirname "${BASH_SOURCE[0]}")/lib/core.sh"
 
 #==============================================================================
 # Git and Repository Functions

@@ -233,13 +233,13 @@ process_example_input() {
     result_length="$(string_length "$processed_result")"
 
     # Create processing metrics
-    create_metric "input_processing_length" "$input_length" "chars" "stage=input"
-    create_metric "input_processing_length" "$result_length" "chars" "stage=output"
+    create_metric "input_processing_length" "${input_length}" "chars" "stage=input"
+    create_metric "input_processing_length" "${result_length}" "chars" "stage=output"
 
     log_info "processing" "Input processed successfully" \
         "input_length=${input_length},result_length=${result_length}"
 
-    echo "$processed_result"
+    echo "${processed_result}"
 }
 
 #==============================================================================
@@ -291,17 +291,17 @@ validate_all_inputs() {
     local validation_errors=()
 
     # Validate working directory exists and is accessible
-    if ! validate_directory_accessible "$working_directory"; then
-        validation_errors+=("working_directory: Directory not accessible: $working_directory")
+    if ! validate_directory_accessible "${working_directory}"; then
+        validation_errors+=("working_directory: Directory not accessible: ${working_directory}")
     fi
 
     # Validate log level is supported
-    case "$(to_lowercase "$log_level")" in
+    case "$(to_lowercase "${log_level}")" in
     debug | info | warn | warning | error)
         # Valid log level
         ;;
     *)
-        validation_errors+=("log_level: Invalid log level '$log_level'")
+        validation_errors+=("log_level: Invalid log level '${log_level}'")
         ;;
     esac
 
@@ -316,7 +316,7 @@ validate_all_inputs() {
             "error_count=${#validation_errors[@]}"
 
         for error in "${validation_errors[@]}"; do
-            log_error "validation" "$error"
+            log_error "validation" "${error}"
         done
 
         return 1
@@ -359,7 +359,7 @@ cleanup() {
     total_execution_time="$((cleanup_end_time - SCRIPT_START_TIME))"
 
     # Create final metrics
-    create_metric "script_total_execution_time" "$total_execution_time" "seconds" \
+    create_metric "script_total_execution_time" "${total_execution_time}" "seconds" \
         "script=${ACTION_NAME},version=${ACTION_VERSION}"
 
     log_info "cleanup" "Cleanup completed" "cleanup_duration=$((cleanup_end_time - cleanup_start_time))s"
@@ -376,13 +376,13 @@ main() {
     log_group_start "Executing ${ACTION_NAME} v${ACTION_VERSION}"
 
     # Validate runtime environment
-    if ! validate_bash_version "$MIN_BASH_VERSION"; then
+    if ! validate_bash_version "${MIN_BASH_VERSION}"; then
         exit 1
     fi
 
     # Extract and validate inputs (immutable after extraction)
     local -r example_input="${INPUT_EXAMPLE_INPUT:-}"
-    local -r working_directory="${INPUT_WORKING_DIRECTORY:-.}"
+    local -r working_directory="${INPUT_WORKING_DIRECTORY:-}"
     local -r log_level="${INPUT_LOG_LEVEL:-info}"
 
     log_info "startup" "Action started" \
@@ -390,14 +390,14 @@ main() {
 
     # Record inputs in summary if enabled
     if [[ "${INPUT_INCLUDE_SUMMARY,,}" == "true" ]]; then
-        set_summary_input "example_input" "$example_input"
-        set_summary_input "working_directory" "$working_directory"
-        set_summary_input "log_level" "$log_level"
+        set_summary_input "example_input" "${example_input}"
+        set_summary_input "working_directory" "${working_directory}"
+        set_summary_input "log_level" "${log_level}"
         record_event "startup" "Action started" "version=${ACTION_VERSION}"
     fi
 
     # Validate all inputs using pure function
-    if ! validate_all_inputs "$example_input" "$working_directory" "$log_level"; then
+    if ! validate_all_inputs "${example_input}" "${working_directory}" "${log_level}"; then
         if [[ "${INPUT_INCLUDE_SUMMARY,,}" == "true" ]]; then
             record_error "validation" "Input validation failed"
         fi
@@ -405,28 +405,28 @@ main() {
     fi
 
     # Process input using functional pipeline
-    log_info "processing" "Processing input" "input_length=$(string_length "$example_input")"
+    log_info "processing" "Processing input" "input_length=$(string_length "${example_input}")"
 
     local processing_start_time processing_result processing_end_time processing_duration
     processing_start_time="$(date +%s)"
 
-    processing_result="$(process_example_input "$example_input")"
+    processing_result="$(process_example_input "${example_input}")"
     local processing_exit_code=$?
 
     processing_end_time="$(date +%s)"
     processing_duration="$((processing_end_time - processing_start_time))"
 
-    if [[ $processing_exit_code -ne 0 ]]; then
+    if [[ ${processing_exit_code} -ne 0 ]]; then
         log_error "processing" "Input processing failed" "exit_code=${processing_exit_code}"
         if [[ "${INPUT_INCLUDE_SUMMARY,,}" == "true" ]]; then
             record_error "processing" "Input processing failed" "exit_code=${processing_exit_code}"
         fi
-        exit $processing_exit_code
+        exit ${processing_exit_code}
     fi
 
     # Create processing metrics
-    create_metric "processing_duration" "$processing_duration" "seconds"
-    create_metric "processing_result_length" "$(string_length "$processing_result")" "chars"
+    create_metric "processing_duration" "${processing_duration}" "seconds"
+    create_metric "processing_result_length" "$(string_length "${processing_result}")" "chars"
 
     # Calculate total execution time
     local script_end_time total_execution_time
@@ -434,18 +434,18 @@ main() {
     total_execution_time="$((script_end_time - SCRIPT_START_TIME))"
 
     # Set outputs using immutable values
-    set_output "example-output" "$processing_result"
-    set_output "execution-time" "$total_execution_time"
-    set_output "script-version" "$ACTION_VERSION"
+    set_output "example-output" "${processing_result}"
+    set_output "execution-time" "${total_execution_time}"
+    set_output "script-version" "${ACTION_VERSION}"
 
     # Record outputs in summary if enabled
     if [[ "${INPUT_INCLUDE_SUMMARY,,}" == "true" ]]; then
-        set_summary_output "example_output" "$processing_result"
-        set_summary_output "execution_time" "$total_execution_time"
-        set_summary_output "script_version" "$ACTION_VERSION"
+        set_summary_output "example_output" "${processing_result}"
+        set_summary_output "execution_time" "${total_execution_time}"
+        set_summary_output "script_version" "${ACTION_VERSION}"
 
         record_event "completion" "Action completed successfully" \
-            "execution_time=${total_execution_time}s,result_length=$(string_length "$processing_result")"
+            "execution_time=${total_execution_time}s,result_length=$(string_length "${processing_result}")"
 
         # Finalize and output summary
         finalize_summary "success"
@@ -453,7 +453,7 @@ main() {
         if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]] && declare -f generate_markdown_summary >/dev/null 2>&1; then
             local markdown_summary
             markdown_summary="$(generate_markdown_summary "${ACTION_NAME} v${ACTION_VERSION} Summary")"
-            echo "$markdown_summary" >>"${GITHUB_STEP_SUMMARY}"
+            echo "${markdown_summary}" >>"${GITHUB_STEP_SUMMARY}"
             log_info "summary" "Summary written to GitHub step summary"
         fi
     fi
