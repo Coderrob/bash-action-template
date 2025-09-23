@@ -16,6 +16,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Make scripts executable
+        run: |
+          echo "Making scripts executable..."
+          find scripts -name "*.sh" -type f -exec chmod +x {} \;
+          find tests -name "*.sh" -type f -exec chmod +x {} \;
+
       - name: Setup ShellCheck
         run: |
           sudo apt-get update
