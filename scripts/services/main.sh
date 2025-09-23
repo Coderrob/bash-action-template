@@ -68,7 +68,8 @@ readonly ACTION_VERSION="2.0.0"
 readonly MIN_BASH_VERSION="4.4"
 
 # Immutable script metadata
-readonly SCRIPT_START_TIME="$(date +%s)"
+readonly SCRIPT_START_TIME
+SCRIPT_START_TIME="$(date +%s)"
 
 #==============================================================================
 # Script Initialization
@@ -380,9 +381,9 @@ main() {
     fi
 
     # Extract and validate inputs (immutable after extraction)
-    local readonly example_input="${INPUT_EXAMPLE_INPUT:-}"
-    local readonly working_directory="${INPUT_WORKING_DIRECTORY:-.}"
-    local readonly log_level="${INPUT_LOG_LEVEL:-info}"
+    local -r example_input="${INPUT_EXAMPLE_INPUT:-}"
+    local -r working_directory="${INPUT_WORKING_DIRECTORY:-.}"
+    local -r log_level="${INPUT_LOG_LEVEL:-info}"
 
     log_info "startup" "Action started" \
         "action=${ACTION_NAME},version=${ACTION_VERSION}"

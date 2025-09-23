@@ -1,9 +1,9 @@
-# 🚨 Quick Fixes Runbook
+# Quick Fixes Runbook
 
 !!! info "RunMe Interactive Runbook"
 This runbook provides quick diagnostic and remediation steps for common issues with the bash-action-template. Click the **Run** button next to each code block to execute it.
 
-## 🔍 Initial Diagnostics
+## Initial Diagnostics
 
 ### Check Environment Setup
 
@@ -37,7 +37,7 @@ bash -n scripts/main.sh && echo "✅ main.sh syntax is valid"
 bash -n scripts/utils.sh && echo "✅ utils.sh syntax is valid"
 ```
 
-## 🛠️ Common Quick Fixes
+## Common Quick Fixes
 
 ### Fix Script Permissions
 
@@ -73,7 +73,7 @@ find . -name "*.log" -delete
 echo "✅ Cleanup complete"
 ```
 
-## 🧪 Testing & Validation
+## Testing & Validation
 
 ### Run Local Action Test
 
@@ -123,7 +123,7 @@ else
 fi
 ```
 
-## 🔧 Advanced Diagnostics
+## Advanced Diagnostics
 
 ### Check GitHub API Rate Limits
 
@@ -162,7 +162,7 @@ time (
 echo "✅ Performance test complete"
 ```
 
-## 🚑 Emergency Recovery
+## Emergency Recovery
 
 ### Reset to Clean State
 
@@ -190,11 +190,11 @@ echo "2. Delete .devcontainer/.vscode-server directory"
 echo "3. Reopen in VS Code and select 'Rebuild Container'"
 ```
 
-## 📞 Getting Help
+## Getting Help
 
 If these quick fixes don't resolve your issue:
 
-1. **Check the full documentation**: Visit our [troubleshooting guide](../troubleshooting/common-issues.md)
+1. **Check the full documentation**: Visit our [maintenance guide](maintenance.md)
 2. **Search existing issues**: Look at [GitHub Issues](https://github.com/Coderrob/bash-action-template/issues)
 3. **Create a new issue**: Provide detailed information about your problem
 4. **Join the discussion**: Check [GitHub Discussions](https://github.com/Coderrob/bash-action-template/discussions)

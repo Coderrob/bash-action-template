@@ -1,9 +1,9 @@
-# 🔧 Maintenance Runbook
+# Maintenance Runbook
 
 !!! info "RunMe Interactive Runbook"
 This runbook provides scheduled maintenance procedures to keep your bash-action-template healthy and up-to-date. Run these regularly to prevent issues.
 
-## 📅 Daily Maintenance
+## Daily Maintenance
 
 ### Update Dependencies
 
@@ -19,7 +19,7 @@ if [[ -f "package.json" ]]; then
     npm audit fix
 fi
 
-echo "✅ Dependencies updated"
+echo "Dependencies updated"
 ```
 
 ### Clean Old Logs and Artifacts
@@ -38,7 +38,7 @@ find . -name "test-output-*" -type f -mtime +1 -delete
 # Clean Docker images (if using Docker)
 docker system prune -f
 
-echo "✅ Cleanup completed"
+echo "Cleanup completed"
 ```
 
 ### Validate Repository Health
@@ -50,243 +50,248 @@ find . -type l -exec test ! -e {} \; -print
 # Validate all YAML files
 for file in $(find . -name "*.yml" -o -name "*.yaml"); do
     echo "Checking $file..."
-    python3 -c "import yaml; yaml.safe_load(open('$file'))" || echo "❌ $file has YAML errors"
+    python3 -c "import yaml; yaml.safe_load(open('$file'))" || echo "$file has YAML errors"
 done
 
 # Check script syntax
 for script in scripts/*.sh; do
     echo "Checking $script..."
-    bash -n "$script" || echo "❌ $script has syntax errors"
+    bash -n "$script" || echo "$script has syntax errors"
 done
 
-echo "✅ Health check completed"
+echo "Health check completed"
 ```
 
-## 📊 Weekly Maintenance
+## Security Maintenance
 
-### Security Audit
+### Run Security Audits
 
 ```bash
-# Run security audit on dependencies
+# Run shell script security checks
+if command -v shellcheck >/dev/null 2>&1; then
+    find scripts/ -name "*.sh" -exec shellcheck --severity=warning {} \;
+fi
+
+# Check for vulnerable dependencies
 if [[ -f "package.json" ]]; then
     npm audit
 fi
 
-# Check for vulnerable patterns in code
-echo "Checking for common security issues..."
+# Scan for secrets (if tool available)
+if command -v gitleaks >/dev/null 2>&1; then
+    gitleaks detect --verbose
+fi
 
-# Look for hardcoded secrets
-grep -r "password\|secret\|token\|key" --include="*.sh" . | grep -v "INPUT_" | grep -v "GITHUB_" || echo "No hardcoded secrets found"
-
-# Check for eval usage
-grep -r "eval" --include="*.sh" . || echo "No eval usage found"
-
-# Check for insecure curl
-grep -r "curl.*-k\|curl.*--insecure" --include="*.sh" . || echo "No insecure curl found"
-
-echo "✅ Security audit completed"
+echo "Security audit completed"
 ```
 
-### Performance Monitoring
+## Performance Maintenance
+
+### Run Benchmarks
 
 ```bash
 # Benchmark action execution time
-echo "Running performance benchmarks..."
+echo "Benchmarking action performance..."
 
-# Test with different input sizes
-for size in 100 1000 10000; do
-    input=$(head -c $size < /dev/zero | tr '\0' 'x')
-    export INPUT_EXAMPLE_INPUT="$input"
-    export GITHUB_OUTPUT="/tmp/perf-test-$size"
+start_time=$(date +%s.%3N)
+export INPUT_EXAMPLE_INPUT="benchmark-test"
+export INPUT_LOG_LEVEL="error"
+export GITHUB_OUTPUT="/tmp/benchmark-output"
 
-    start_time=$(date +%s%N)
-    ./scripts/main.sh >/dev/null 2>&1
-    end_time=$(date +%s%N)
+./scripts/main.sh >/dev/null 2>&1
 
-    duration=$(( (end_time - start_time) / 1000000 ))  # Convert to milliseconds
-    echo "Input size $size: ${duration}ms"
-done
+end_time=$(date +%s.%3N)
+execution_time=$(echo "$end_time - $start_time" | bc)
 
-echo "✅ Performance benchmarks completed"
+echo "Execution time: ${execution_time}s"
+
+echo "Performance benchmarks completed"
 ```
 
-### Update Tool Versions
+## Version Management
+
+### Check for Updates
 
 ```bash
-# Check current tool versions
-echo "Current tool versions:"
-shellcheck --version
-shfmt --version
-act --version 2>/dev/null || echo "act not installed"
+# Check for newer versions of tools
+check_tool_version() {
+    local tool=$1
+    local current_version
+    current_version=$(command -v "$tool" >/dev/null 2>&1 && "$tool" --version 2>&1 | head -1 || echo "not installed")
+    echo "$tool: $current_version"
+}
 
-# Check for updates (manual step - would need automation)
-echo "To update tools manually:"
-echo "1. shellcheck: Check https://github.com/koalaman/shellcheck/releases"
-echo "2. shfmt: Check https://github.com/mvdan/sh/releases"
-echo "3. act: Check https://github.com/nektos/act/releases"
+check_tool_version bash
+check_tool_version git
+check_tool_version shellcheck
+check_tool_version shfmt
 
-echo "✅ Version check completed"
+echo "Version check completed"
 ```
 
-## 📈 Monthly Maintenance
+## Testing Maintenance
 
-### Comprehensive Testing
+### Run Comprehensive Tests
 
 ```bash
-# Run full test suite
-echo "Running comprehensive tests..."
+# Run all available tests
+echo "Running comprehensive test suite..."
 
-# Unit tests (if any)
-if [[ -d "tests/" ]]; then
-    for test in tests/*.sh; do
-        echo "Running $test..."
-        bash "$test" || echo "❌ $test failed"
-    done
+# Unit tests
+if [[ -f "tests/test_runner.sh" ]]; then
+    ./tests/test_runner.sh
 fi
 
 # Integration tests with act
-if which act >/dev/null 2>&1; then
-    echo "Running integration tests with act..."
-    act -j test-action --container-architecture linux/amd64 || echo "❌ Integration tests failed"
-else
-    echo "act not available for integration testing"
+if command -v act >/dev/null 2>&1; then
+    act -j test --container-architecture linux/amd64
 fi
 
-echo "✅ Comprehensive testing completed"
+# Load tests (if implemented)
+if [[ -f "tests/load_test.sh" ]]; then
+    ./tests/load_test.sh
+fi
+
+echo "Comprehensive testing completed"
 ```
 
-### Code Quality Review
+## Code Quality Maintenance
+
+### Automated Code Review
 
 ```bash
-# Run all linting and formatting checks
-echo "Running code quality checks..."
+# Run code quality checks
+echo "Running code quality analysis..."
 
-# ShellCheck
-find scripts/ -name "*.sh" -exec shellcheck {} \;
+# Lint shell scripts
+if command -v shellcheck >/dev/null 2>&1; then
+    find scripts/ -name "*.sh" -exec shellcheck {} \;
+fi
 
-# Formatting check
-find scripts/ -name "*.sh" -exec shfmt -d {} \;
+# Format code
+if command -v shfmt >/dev/null 2>&1; then
+    shfmt -d scripts/*.sh
+fi
 
-# YAML validation
-find . -name "*.yml" -o -name "*.yaml" | xargs -I {} python3 -c "import yaml; yaml.safe_load(open('{}'))"
+# Check for TODO comments
+grep -r "TODO\|FIXME\|XXX" scripts/ || echo "No TODO comments found"
 
-echo "✅ Code quality review completed"
+echo "Code quality review completed"
 ```
 
-### Backup Important Data
+## Backup Procedures
+
+### Create Repository Backup
 
 ```bash
 # Create timestamped backup
 timestamp=$(date +%Y%m%d_%H%M%S)
-backup_dir="/tmp/bash-action-backup-$timestamp"
+backup_dir="backup_$timestamp"
 
 mkdir -p "$backup_dir"
+cp -r . "$backup_dir/"
 
-# Backup configuration files
-cp action.yml "$backup_dir/"
-cp -r scripts/ "$backup_dir/"
-cp -r .github/ "$backup_dir/"
+# Compress backup
+tar -czf "${backup_dir}.tar.gz" "$backup_dir"
+rm -rf "$backup_dir"
 
-# Create archive
-tar -czf "$backup_dir.tar.gz" -C /tmp "bash-action-backup-$timestamp"
-
-echo "✅ Backup created: $backup_dir.tar.gz"
-echo "Consider storing this in a safe location"
+echo "Backup created: ${backup_dir}.tar.gz"
 ```
 
-## 🔄 Self-Healing Procedures
+## Self-Healing Procedures
 
-### Automated Repository Maintenance
-
-```bash
-# Run self-healing workflow (if available)
-if [[ -f ".github/workflows/self-healing.yml" ]]; then
-    echo "Triggering self-healing workflow..."
-    # This would typically be done via GitHub API
-    echo "Manual trigger: Go to Actions tab and run 'Self-Healing' workflow"
-else
-    echo "Self-healing workflow not configured"
-fi
-```
-
-### Fix Common Issues Automatically
+### Automated Issue Resolution
 
 ```bash
-# Auto-fix script permissions
+# Attempt to fix common issues automatically
+echo "Running self-healing procedures..."
+
+# Fix permissions
 chmod +x scripts/*.sh
 
-# Auto-fix common formatting issues
-if which shfmt >/dev/null 2>&1; then
-    find scripts/ -name "*.sh" -exec shfmt -w {} \;
-    echo "✅ Scripts auto-formatted"
+# Auto-format code
+if command -v shfmt >/dev/null 2>&1; then
+    shfmt -w scripts/*.sh
+    echo "Scripts auto-formatted"
 fi
 
-# Clean up whitespace in YAML files
-for file in $(find . -name "*.yml" -o -name "*.yaml"); do
-    # Remove trailing whitespace
-    sed -i 's/[[:space:]]*$//' "$file"
-done
+# Reinstall missing dependencies (if possible)
+# Add dependency auto-installation logic here
 
-echo "✅ Auto-fixes applied"
+echo "Auto-fixes applied"
 ```
 
-## 📋 Maintenance Checklist
-
-Use this checklist to ensure all maintenance tasks are completed:
-
-### Daily Tasks
-
-- [ ] Update system packages
-- [ ] Clean temporary files
-- [ ] Validate repository health
+## Maintenance Checklist
 
 ### Weekly Tasks
 
-- [ ] Run security audit
-- [ ] Performance monitoring
-- [ ] Check tool versions
+- [ ] Review security audit results
+- [ ] Update all dependencies
+- [ ] Run performance benchmarks
+- [ ] Check for tool updates
+- [ ] Validate backup integrity
 
 ### Monthly Tasks
 
-- [ ] Comprehensive testing
-- [ ] Code quality review
-- [ ] Create backups
+- [ ] Full repository audit
+- [ ] Performance optimization review
+- [ ] Documentation updates
+- [ ] Team knowledge sharing
 
 ### Quarterly Tasks
 
-- [ ] Review and update dependencies
-- [ ] Audit access permissions
-- [ ] Update documentation
+- [ ] Major version updates
+- [ ] Architecture review
+- [ ] Security assessment
+- [ ] Process improvements
 
-## 🚨 Alert Configuration
+## Alert Configuration
 
 ### Set Up Monitoring Alerts
 
 ```bash
-# Example: Monitor for failed workflows
-echo "To set up workflow failure alerts:"
-echo "1. Go to repository Settings > Notifications"
-echo "2. Configure email alerts for workflow failures"
-echo "3. Set up Slack/Discord webhooks for critical alerts"
+# Configure alerts for critical issues
+setup_alerts() {
+    echo "Configuring maintenance alerts..."
 
-# Example: Monitor repository size
-repo_size=$(du -sh . | cut -f1)
-echo "Current repository size: $repo_size"
+    # Check repository size
+    repo_size=$(du -s . | cut -f1)
+    if [[ $repo_size -gt 100000 ]]; then  # 100MB
+        echo "Warning: Repository size is getting large. Consider cleanup."
+    fi
 
-if [[ $(du -s . | cut -f1) -gt 100000 ]]; then
-    echo "⚠️ Repository size is getting large. Consider cleanup."
-fi
+    # Check for large files
+    find . -type f -size +50M -exec ls -lh {} \;
+
+    # Alert on failed health checks
+    if ! bash health-check.sh >/dev/null 2>&1; then
+        echo "Alert: Health check failed - manual intervention required"
+    fi
+}
+
+setup_alerts
 ```
 
-## 📞 Escalation Procedures
+## Escalation Procedures
 
-If maintenance tasks reveal critical issues:
+### When to Escalate
 
-1. **Stop automated processes** immediately
-2. **Create a new branch** for emergency fixes
-3. **Notify team members** via appropriate channels
-4. **Document the issue** with detailed reproduction steps
-5. **Implement fix** with comprehensive testing
-6. **Deploy gradually** with rollback plan ready
+1. **Security Vulnerabilities**: Immediately escalate to security team
+2. **Data Loss**: Escalate to data recovery team
+3. **System Down**: Escalate to infrastructure team
+4. **Performance Degradation**: Escalate to performance team
 
-Remember: **Maintenance is prevention, not reaction**. Regular attention keeps small issues from becoming big problems.
+### Escalation Contacts
+
+- Security Team: <security@company.com>
+- Infrastructure: <infra@company.com>
+- Development: <dev@company.com>
+
+### Emergency Contacts
+
+- On-call Engineer: +1-555-0123
+- Management: +1-555-0124
+
+---
+
+This maintenance runbook ensures your bash-action-template remains healthy, secure, and performant. Run these procedures regularly to prevent issues before they occur.

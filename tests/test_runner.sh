@@ -65,9 +65,15 @@ source "$(dirname "${BASH_SOURCE[0]}")/../scripts/lib/core.sh"
 # shellcheck source=../scripts/lib/script_init.sh
 source "$(dirname "${BASH_SOURCE[0]}")/../scripts/lib/script_init.sh"
 
+# Source utility functions library
+# shellcheck source=../scripts/lib/utils.sh
+source "$(dirname "${BASH_SOURCE[0]}")/../scripts/lib/utils.sh"
+
 # Define test script directory for test output
 readonly TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export TEST_SCRIPT_DIR
 readonly TEST_OUTPUT_DIR="/tmp/bash_action_test_$$"
+export TEST_OUTPUT_DIR
 
 # Test framework constants (immutable)
 readonly TEST_FRAMEWORK_VERSION="2.0.0"
@@ -494,11 +500,11 @@ main() {
     echo "============================================"
 
     # Run all test suites
-    run_test "File Existence" "test_file_existence"
-    run_test "Script Permissions" "test_script_permissions"
-    run_test "Utility Functions" "test_utility_functions"
-    run_test "String Functions" "test_string_functions"
-    run_test "Basic Execution" "test_basic_execution"
+    run_test "File Existence" "test_file_existence" || true
+    run_test "Script Permissions" "test_script_permissions" || true
+    run_test "Utility Functions" "test_utility_functions" || true
+    run_test "String Functions" "test_string_functions" || true
+    run_test "Basic Execution" "test_basic_execution" || true
 
     # Generate and display final report
     local test_exit_code

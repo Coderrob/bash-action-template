@@ -47,7 +47,7 @@ if [[ -z "${CONSTANTS_SOURCED+x}" ]]; then
 
     # Color Codes for Output
     readonly COLOR_RESET='\033[0m'
-    readonly COLOR_NC='\033[0m'  # No Color alias
+    readonly COLOR_NC='\033[0m' # No Color alias
     readonly COLOR_BLACK='\033[0;30m'
     readonly COLOR_RED='\033[0;31m'
     readonly COLOR_GREEN='\033[0;32m'

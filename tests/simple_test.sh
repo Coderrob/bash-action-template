@@ -92,6 +92,8 @@ echo "Testing basic action execution..."
 export INPUT_EXAMPLE_INPUT="test-value"
 export INPUT_LOG_LEVEL="info"
 export INPUT_WORKING_DIRECTORY="."
+export INPUT_INCLUDE_SUMMARY="false"
+export INPUT_CHECK_RATE_LIMIT="false"
 
 # Mock GitHub Actions environment
 temp_output_file="/tmp/github_output_test"

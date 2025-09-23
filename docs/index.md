@@ -1,44 +1,47 @@
-# 🏠 Welcome to Bash Action Template
+# Welcome to Bash Action Template
 
-Hey there! 👋 I'm happy you've found your way to the Bash Action Template. Whether you're a seasoned DevOps wizard or just dipping your toes into the world of GitHub Actions, you've come to the right place. Let's build something amazing together!
+Hey there! I'm happy you've found your way to the Bash Action Template. Whether you're a seasoned DevOps wizard or just dipping your toes into the world of GitHub Actions, you've come to the right place. Let's build something amazing together!
 
-## 🌟 What Makes This Special?
+## What Makes This Special?
 
 This isn't just another template—it's a carefully crafted toolkit designed to make your GitHub Actions journey smooth, reliable, and downright enjoyable. Here's what sets it apart:
 
-### 🚀 Production-Ready Foundation
+### Production-Ready Foundation
 
 - **Industry Best Practices**: Built on solid shell scripting principles with `set -euo pipefail` and comprehensive error handling
 - **Comprehensive Logging**: Multi-level logging with structured output and GitHub Actions integration
 - **Input Validation**: Robust validation and sanitization to keep your actions bulletproof
 
-### 🛠️ Developer Experience First
+### Developer Experience First
 
 - **DevContainer Ready**: One-click development environment with all tools pre-configured
 - **Local Testing**: Full CI simulation and integration testing with `act`
 - **Self-Healing**: Automated maintenance that keeps your repository healthy and up-to-date
 
-### 🔧 Extensible & Customizable
+### Extensible & Customizable
 
 - **Modular Design**: Easy to extend with custom inputs, outputs, and utility functions
 - **Composite Actions**: Leverage GitHub's composite action approach for better reusability
 - **Rich Ecosystem**: Integrates with popular tools like ShellCheck, shfmt, and Prettier
 
-## 🎯 Quick Start Paths
+## Quick Start Paths
 
 === "New to GitHub Actions?"
 Perfect! Start with our [Getting Started Guide](getting-started/index.md) and [Quick Start Tutorial](getting-started/quick-start.md). We'll hold your hand through creating your first action.
 
 === "Experienced Developer?"
-Jump straight into the [Development Setup](getting-started/development-setup.md) and explore our [DevContainer](getting-started/devcontainer.md) for the ultimate development experience.
+Jump straight into the [Forking & Customizing](getting-started/forking-and-customizing.md) to adapt the template to your needs.
+
+=== "Need Troubleshooting?"
+Check our [Runbooks](runbooks/quick-fixes.md) for common solutions and maintenance procedures.
 
 === "Looking to Extend?"
-Check out our [Extending Guide](extending/index.md) to learn how to customize inputs, outputs, and add advanced functionality.
+Check out our [Runbooks](runbooks/quick-fixes.md) for maintenance and troubleshooting procedures.
 
 === "Need Inspiration?"
-Browse our [Examples](examples/index.md) to see real-world scenarios and get ideas for your own implementations.
+Explore our [Runbooks](runbooks/quick-fixes.md) for practical procedures and maintenance tips.
 
-## 📚 Key Features at a Glance
+## Key Features at a Glance
 
 | Feature                   | Description                                 | Why It Matters                                       |
 | ------------------------- | ------------------------------------------- | ---------------------------------------------------- |
@@ -49,7 +52,7 @@ Browse our [Examples](examples/index.md) to see real-world scenarios and get ide
 | **Security Scanning**     | Built-in security checks                    | Catch vulnerabilities before they reach production   |
 | **Code Quality**          | ShellCheck, shfmt, and Prettier integration | Maintain high code standards                         |
 
-## 🏗️ Architecture Overview
+## Architecture Overview
 
     ```mermaid
     graph TB
@@ -70,16 +73,16 @@ Browse our [Examples](examples/index.md) to see real-world scenarios and get ide
         style J fill:#e8f5e8
     ```
 
-## 🤝 Community & Support
+## Community & Support
 
 We're building this together! Here's how to get involved:
 
-- **📖 Documentation**: Comprehensive guides for every aspect of the template
-- **🐛 Issue Tracking**: Found a bug? [Let us know!](https://github.com/Coderrob/bash-action-template/issues)
-- **💡 Feature Requests**: Have an idea? [Share it!](https://github.com/Coderrob/bash-action-template/discussions)
-- **🤝 Contributing**: See our [Contributing Guide](contributing.md) to get started
+- **Documentation**: Comprehensive guides for every aspect of the template
+- **Issue Tracking**: Found a bug? [Let us know!](https://github.com/Coderrob/bash-action-template/issues)
+- **Feature Requests**: Have an idea? [Share it!](https://github.com/Coderrob/bash-action-template/discussions)
+- **Contributing**: See our [Contributing Guide](contributing.md) to get started
 
-## 🚨 Troubleshooting
+## Troubleshooting
 
 Running into issues? Don't worry—we've got you covered:
 
@@ -87,12 +90,12 @@ Running into issues? Don't worry—we've got you covered:
 - **Maintenance**: [Scheduled maintenance](runbooks/maintenance.md) keeps everything running smoothly
 - **Recovery**: [Recovery procedures](runbooks/recovery.md) for when things go sideways
 
-## 🎉 Let's Get Started
+## Let's Get Started
 
 Ready to create your first GitHub Action? Choose your path:
 
 [:fontawesome-solid-rocket: Quick Start](getting-started/quick-start.md){ .md-button .md-button--primary }
-[:fontawesome-solid-cog: Development Setup](getting-started/development-setup.md){ .md-button }
+[:fontawesome-solid-cog: Forking & Customizing](getting-started/forking-and-customizing.md){ .md-button }
 [:fontawesome-solid-book: Learn More](getting-started/index.md){ .md-button }
 
 ---
@@ -101,4 +104,4 @@ Ready to create your first GitHub Action? Choose your path:
 The best way to learn is by doing. Start with a simple action, then gradually add complexity as you get comfortable. Remember: every expert was once a beginner!
 
 !!! note "Version Info"
-This documentation is for the latest version. Check the [changelog](changelog.md) for recent updates and breaking changes.
+This documentation is for the latest version.

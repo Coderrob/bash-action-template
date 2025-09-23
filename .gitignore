@@ -62,3 +62,6 @@ tests/output/
 # Local development
 .local/
 local.sh
+
+# Mkdocs site
+site/

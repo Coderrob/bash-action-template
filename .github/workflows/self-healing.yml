@@ -3,23 +3,23 @@ name: Self-Healing
 on:
   schedule:
     # Run daily at 2 AM UTC
-    - cron: '0 2 * * *'
+    - cron: "0 2 * * *"
   workflow_dispatch:
     inputs:
       force_update:
-        description: 'Force update even if no changes detected'
+        description: "Force update even if no changes detected"
         required: false
         default: false
         type: boolean
       license_header:
-        description: 'License header to add to source files'
+        description: "License header to add to source files"
         required: false
-        default: 'GPL-3.0-only'
+        default: "GPL-3.0-only"
         type: string
       license_holder:
-        description: 'Name of the license holder'
+        description: "Name of the license holder"
         required: false
-        default: 'Robert Lindley'
+        default: "Robert Lindley"
         type: string
 
 jobs:

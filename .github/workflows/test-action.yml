@@ -4,14 +4,14 @@ on:
   workflow_dispatch:
     inputs:
       example_input:
-        description: 'Example input value'
+        description: "Example input value"
         required: false
-        default: 'test-value'
+        default: "test-value"
         type: string
       log_level:
-        description: 'Log level'
+        description: "Log level"
         required: false
-        default: 'info'
+        default: "info"
         type: choice
         options:
           - debug
@@ -46,8 +46,8 @@ jobs:
         id: test-custom
         uses: ./
         with:
-          example_input: 'custom-test-input'
-          log_level: 'debug'
+          example_input: "custom-test-input"
+          log_level: "debug"
 
       - name: Verify Custom Output
         run: |
@@ -63,18 +63,18 @@ jobs:
     strategy:
       matrix:
         include:
-          - example_input: 'hello-world'
-            log_level: 'debug'
-            expected: 'HELLO-WORLD'
-          - example_input: 'test_case'
-            log_level: 'info'
-            expected: 'TEST_CASE'
-          - example_input: 'mixed-CASE-input'
-            log_level: 'warn'
-            expected: 'MIXED-CASE-INPUT'
-          - example_input: ''
-            log_level: 'error'
-            expected: ''
+          - example_input: "hello-world"
+            log_level: "debug"
+            expected: "HELLO-WORLD"
+          - example_input: "test_case"
+            log_level: "info"
+            expected: "TEST_CASE"
+          - example_input: "mixed-CASE-input"
+            log_level: "warn"
+            expected: "MIXED-CASE-INPUT"
+          - example_input: ""
+            log_level: "error"
+            expected: ""
     steps:
       - name: Checkout
         uses: actions/checkout@v4

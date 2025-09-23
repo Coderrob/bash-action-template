@@ -1,10 +1,10 @@
-# 🌟 Welcome to Your Bash Action Journey
+# Welcome to Your Bash Action Journey
 
 !!! quote "Hello, fellow action crafter! Let's build something amazing together."
 
     Welcome! I'm genuinely excited that you've decided to explore the world of GitHub Actions with bash scripting. Whether you're here because you love the simplicity and power of shell scripts, or you're looking to level up your DevOps game, you've made an excellent choice.
 
-## 🤔 Why Bash Actions? Why Now?
+## Why Bash Actions? Why Now?
 
 Let me share a perspective that's shaped by years of working with CI/CD systems and automation:
 
@@ -28,7 +28,7 @@ GitHub Actions has revolutionized how we think about automation. But here's the 
 - **Scale effortlessly** from personal projects to enterprise deployments
 - **Integrate seamlessly** with existing shell-based tooling
 
-## 🎯 What You'll Learn Here
+## What You'll Learn Here
 
 This guide isn't just documentation—it's your roadmap to becoming confident with bash actions. We'll cover:
 
@@ -50,7 +50,7 @@ This guide isn't just documentation—it's your roadmap to becoming confident wi
 - Self-healing and automated maintenance
 - Testing strategies and quality assurance
 
-## 🛠️ Your Development Environment
+## Your Development Environment
 
 Before we dive in, let's make sure you're set up for success. We offer two paths:
 
@@ -74,34 +74,23 @@ If you prefer to configure your own environment:
 - Set up shfmt for formatting
 - Consider installing act for local testing
 
-## 📚 Learning Path
+## Learning Path
 
 I've structured this guide to take you from curious beginner to confident action author. Here's your journey:
 
 ### Phase 1: Getting Comfortable
 
 1. **[Quick Start](quick-start.md)**: Your first action in 10 minutes
-2. **[Development Setup](development-setup.md)**: Environment configuration
-3. **[DevContainer Guide](devcontainer.md)**: Mastering the development environment
+2. **[Forking & Customizing](forking-and-customizing.md)**: Adapting the template
 
-### Phase 2: Building Knowledge
+### Phase 2: Runbooks
 
-1. **[Action Fundamentals](../features/index.md)**: Understanding how actions work
-2. **[Logging & Monitoring](../features/logging-monitoring.md)**: Making your actions observable
-3. **[Testing Strategies](../features/testing-ci.md)**: Ensuring reliability
+1. **[Quick Fixes](../runbooks/quick-fixes.md)**: Common solutions
+2. **[Maintenance](../runbooks/maintenance.md)**: Keeping things running
+3. **[Self-Healing](../runbooks/self-healing.md)**: Automated maintenance
+4. **[Recovery](../runbooks/recovery.md)**: When things go wrong
 
-### Phase 3: Going Advanced
-
-1. **[Custom Inputs/Outputs](../extending/custom-io.md)**: Making actions flexible
-2. **[Utility Functions](../extending/utilities.md)**: Building reusable components
-3. **[Self-Healing](../features/self-healing.md)**: Automated maintenance
-
-### Phase 4: Real World
-
-1. **[Example Scenarios](../examples/index.md)**: Learning from practical cases
-2. **[Troubleshooting](../troubleshooting/common-issues.md)**: When things don't go as planned
-
-## 🎨 Our Philosophy
+## Our Philosophy
 
 As you work through these guides, you'll notice we emphasize certain principles:
 
@@ -126,7 +115,7 @@ This template exists because the community asked for it. We believe in:
 - Welcoming newcomers
 - Continuous improvement
 
-## 🚀 Ready to Begin?
+## Ready to Begin?
 
 The best way to learn is by doing. I encourage you to:
 
@@ -141,5 +130,5 @@ Every expert was once a beginner. Every complex system started as a simple scrip
 ---
 
 [:fontawesome-solid-play: Start Your Journey](quick-start.md){ .md-button .md-button--primary }
-[:fontawesome-solid-cog: Set Up Your Environment](development-setup.md){ .md-button }
-[:fontawesome-solid-question: Have Questions?](../troubleshooting/common-issues.md){ .md-button }
+[:fontawesome-solid-cog: Set Up Your Environment](forking-and-customizing.md){ .md-button }
+[:fontawesome-solid-question: Have Questions?](../runbooks/quick-fixes.md){ .md-button }

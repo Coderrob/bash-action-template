@@ -2,7 +2,7 @@
 
 Thank you for your interest in contributing to this project! This document provides guidelines and information for contributors.
 
-## 🤝 Code of Conduct
+## Code of Conduct
 
 By participating in this project, you are expected to uphold our code of conduct:
 
@@ -11,7 +11,7 @@ By participating in this project, you are expected to uphold our code of conduct
 - **Be constructive**: Provide helpful feedback and suggestions
 - **Be collaborative**: Work together towards common goals
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -104,7 +104,7 @@ gh workflow run self-healing.yml
 
 Automated maintenance creates branches with the pattern `self-healing/{run_id}` and opens pull requests for review.
 
-## 🔧 Development Guidelines
+## Development Guidelines
 
 ### Shell Scripting Standards
 
@@ -151,7 +151,7 @@ All contributions must pass:
    act -j test
    ```
 
-## 📝 Commit Guidelines
+## Commit Guidelines
 
 ### Commit Message Format
 
@@ -184,7 +184,7 @@ docs: update README with new usage examples
 test: add tests for utility functions
 ```
 
-## 📋 Pull Request Process
+## Pull Request Process
 
 1. **Ensure your code follows** the style guidelines
 2. **Update documentation** if necessary
@@ -249,7 +249,7 @@ When creating a PR, please include:
 - **Testing performed**
 - **Checklist of completed items**
 
-## 🐛 Reporting Issues
+## Reporting Issues
 
 ### Bug Reports
 
@@ -318,7 +318,7 @@ Releases follow semantic versioning (SemVer):
 4. **Tag the release**
 5. **Publish GitHub release**
 
-## 💡 Tips for Contributors
+## Tips for Contributors
 
 - **Start small**: Begin with documentation fixes or small bug fixes
 - **Ask questions**: Don't hesitate to ask for clarification
@@ -326,7 +326,7 @@ Releases follow semantic versioning (SemVer):
 - **Stay updated**: Keep your fork synchronized with the main repository
 - **Test thoroughly**: Always test your changes before submitting
 
-## 📞 Getting Help
+## Getting Help
 
 If you need help or have questions:
 
@@ -345,4 +345,4 @@ Contributors will be recognized in:
 
 ---
 
-Thank you for contributing to make this project better! 🎉
+Thank you for contributing to make this project better!

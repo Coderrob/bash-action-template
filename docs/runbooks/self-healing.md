@@ -1,9 +1,9 @@
-# 🔄 Self-Healing Runbook
+# Self-Healing Runbook
 
 !!! info "RunMe Interactive Runbook"
 This runbook provides automated procedures to detect and fix common repository issues. Designed to run as part of CI/CD or scheduled maintenance.
 
-## 🚨 Automated Issue Detection
+## Automated Issue Detection
 
 ### Health Check Script
 
@@ -13,7 +13,7 @@ This runbook provides automated procedures to detect and fix common repository i
 
 set -euo pipefail
 
-echo "🔍 Running comprehensive health check..."
+echo "Running comprehensive health check..."
 
 # Colors for output
 RED='\033[0;31m'
@@ -83,7 +83,7 @@ for tool in "${optional_tools[@]}"; do
     if command -v "$tool" >/dev/null 2>&1; then
         report_success "$tool is available"
     else
-        echo -e "${YELLOW}⚠️ $tool is not available (optional)${NC}"
+        echo -e "${YELLOW}Warning: $tool is not available (optional)${NC}"
     fi
 done
 
@@ -121,10 +121,10 @@ fi
 # Summary
 echo
 if [[ $issues_found -eq 0 ]]; then
-    echo -e "${GREEN}🎉 All health checks passed! Repository is healthy.${NC}"
+    echo -e "${GREEN}All health checks passed! Repository is healthy.${NC}"
     exit 0
 else
-    echo -e "${RED}⚠️ Found $issues_found issue(s) that need attention.${NC}"
+    echo -e "${RED}Found $issues_found issue(s) that need attention.${NC}"
     exit 1
 fi
 ```
@@ -136,7 +136,7 @@ fi
 bash health-check.sh
 ```
 
-## 🔧 Automated Fixes
+## Automated Fixes
 
 ### Permission Auto-Fix
 
@@ -144,7 +144,7 @@ bash health-check.sh
 # Automatically fix script permissions
 echo "Fixing script permissions..."
 find scripts/ -name "*.sh" -type f -exec chmod +x {} \;
-echo "✅ All scripts are now executable"
+echo "All scripts are now executable"
 ```
 
 ### Dependency Auto-Installation
@@ -158,9 +158,9 @@ install_if_missing() {
     if ! command -v "$tool" >/dev/null 2>&1; then
         echo "Installing $tool..."
         apt-get update && apt-get install -y "$package"
-        echo "✅ $tool installed"
+        echo "$tool installed"
     else
-        echo "✅ $tool already installed"
+        echo "$tool already installed"
     fi
 }
 
@@ -175,9 +175,9 @@ if ! command -v act >/dev/null 2>&1; then
     tar -xzf /tmp/act.tar.gz -C /tmp
     mv /tmp/act /usr/local/bin/act
     chmod +x /usr/local/bin/act
-    echo "✅ act installed"
+    echo "act installed"
 else
-    echo "✅ act already installed"
+    echo "act already installed"
 fi
 ```
 
@@ -188,13 +188,13 @@ fi
 if command -v shfmt >/dev/null 2>&1; then
     echo "Auto-formatting shell scripts..."
     find scripts/ -name "*.sh" -exec shfmt -w {} \;
-    echo "✅ Scripts formatted"
+    echo "Scripts formatted"
 else
-    echo "⚠️ shfmt not available for auto-formatting"
+    echo "shfmt not available for auto-formatting"
 fi
 ```
 
-## 🔄 Self-Healing Workflow
+## Self-Healing Workflow
 
 ### Automated Maintenance Script
 
@@ -205,14 +205,14 @@ fi
 
 set -euo pipefail
 
-echo "🔄 Starting self-healing maintenance..."
+echo "Starting self-healing maintenance..."
 
 # Step 1: Run health check
 echo "Step 1: Health check..."
 if ! bash health-check.sh; then
-    echo "❌ Health check failed, attempting fixes..."
+    echo "Health check failed, attempting fixes..."
 else
-    echo "✅ Health check passed"
+    echo "Health check passed"
 fi
 
 # Step 2: Apply automatic fixes
@@ -224,21 +224,21 @@ bash auto-format-code.sh
 # Step 3: Re-run health check
 echo "Step 3: Re-running health check..."
 if bash health-check.sh; then
-    echo "✅ Self-healing successful!"
+    echo "Self-healing successful!"
 else
-    echo "❌ Some issues remain - manual intervention required"
+    echo "Some issues remain - manual intervention required"
     exit 1
 fi
 
 # Step 4: Run tests
 echo "Step 4: Running tests..."
 if command -v act >/dev/null 2>&1; then
-    act -j test-action --container-architecture linux/amd64 || echo "⚠️ Some tests failed"
+    act -j test-action --container-architecture linux/amd64 || echo "Some tests failed"
 else
-    echo "⚠️ act not available for testing"
+    echo "act not available for testing"
 fi
 
-echo "🔄 Self-healing maintenance completed"
+echo "Self-healing maintenance completed"
 ```
 
 ### GitHub Actions Integration
@@ -274,7 +274,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "chore: self-healing maintenance"
-          title: "🤖 Self-Healing Maintenance"
+          title: "Self-Healing Maintenance"
           body: |
             Automated maintenance performed by self-healing workflow.
 
@@ -287,7 +287,7 @@ jobs:
           delete-branch: true
 ```
 
-## 📊 Monitoring & Alerts
+## Monitoring & Alerts
 
 ### Health Status Dashboard
 
@@ -300,9 +300,9 @@ generate_health_report() {
 
     echo "## Repository Health"
     if bash health-check.sh >/dev/null 2>&1; then
-        echo "✅ Repository is healthy"
+        echo "Repository is healthy"
     else
-        echo "❌ Repository has issues requiring attention"
+        echo "Repository has issues requiring attention"
     fi
     echo
 
@@ -310,9 +310,9 @@ generate_health_report() {
     tools=("bash" "git" "shellcheck" "shfmt" "act")
     for tool in "${tools[@]}"; do
         if command -v "$tool" >/dev/null 2>&1; then
-            echo "✅ $tool: Available"
+            echo "$tool: Available"
         else
-            echo "❌ $tool: Missing"
+            echo "$tool: Missing"
         fi
     done
     echo
@@ -335,7 +335,7 @@ send_alert() {
     local message=$1
     local severity=${2:-warning}
 
-    echo "🚨 $severity: $message"
+    echo "$severity: $message"
 
     # In a real implementation, this could:
     # - Send Slack notifications
@@ -367,7 +367,7 @@ check_critical_issues() {
 check_critical_issues
 ```
 
-## 🔧 Recovery Procedures
+## Recovery Procedures
 
 ### Emergency Recovery Script
 
@@ -377,18 +377,18 @@ check_critical_issues
 
 set -euo pipefail
 
-echo "🚑 Starting emergency recovery..."
+echo "Starting emergency recovery..."
 
 # Step 1: Create backup
 backup_dir="/tmp/emergency-backup-$(date +%Y%m%d_%H%M%S)"
 mkdir -p "$backup_dir"
 cp -r . "$backup_dir/"
-echo "✅ Backup created in $backup_dir"
+echo "Backup created in $backup_dir"
 
 # Step 2: Reset to last known good state
 echo "Resetting to last known good commit..."
 git reset --hard HEAD~1 2>/dev/null || git reset --hard origin/main
-echo "✅ Repository reset"
+echo "Repository reset"
 
 # Step 3: Reapply fixes
 echo "Reapplying fixes..."
@@ -397,9 +397,9 @@ chmod +x scripts/*.sh
 
 # Step 4: Validate recovery
 if bash health-check.sh; then
-    echo "✅ Recovery successful"
+    echo "Recovery successful"
 else
-    echo "❌ Recovery incomplete - manual intervention required"
+    echo "Recovery incomplete - manual intervention required"
     exit 1
 fi
 ```
@@ -412,7 +412,7 @@ rollback_to_previous() {
     echo "Rolling back to previous commit..."
     git reset --hard HEAD~1
     git push --force-with-lease origin main
-    echo "✅ Rollback completed"
+    echo "Rollback completed"
 }
 
 # Rollback with safety checks
@@ -421,7 +421,7 @@ safe_rollback() {
 
     # Check if rollback is safe
     if git status --porcelain | grep -q .; then
-        echo "❌ Uncommitted changes present - commit or stash first"
+        echo "Uncommitted changes present - commit or stash first"
         exit 1
     fi
 
@@ -438,7 +438,7 @@ safe_rollback() {
 # safe_rollback
 ```
 
-## 📈 Continuous Improvement
+## Continuous Improvement
 
 ### Learning from Failures
 

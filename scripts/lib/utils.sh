@@ -159,6 +159,24 @@ command_exists() {
     validate_command_exists "$1"
 }
 
+# Trim leading and trailing whitespace from a string
+# Usage: trim_string "  string  "
+trim_string() {
+    echo "$1" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'
+}
+
+# Convert string to uppercase
+# Usage: to_uppercase "string"
+to_uppercase() {
+    echo "${1^^}"
+}
+
+# Convert string to lowercase
+# Usage: to_lowercase "STRING"
+to_lowercase() {
+    echo "${1,,}"
+}
+
 # Check GitHub API rate limits
 check_github_rate_limit() {
     local min_remaining="${1:-50}"
@@ -351,3 +369,7 @@ export -f check_github_rate_limit
 export -f validate_not_empty
 export -f validate_required
 export -f validate_array_not_empty
+export -f validate_directory_exists
+export -f trim_string
+export -f to_uppercase
+export -f to_lowercase

@@ -1,10 +1,10 @@
-# 🚀 Quick Start: Your First Bash Action in 10 Minutes
+# Quick Start: Your First Bash Action in 10 Minutes
 
 !!! quote "Let's create something awesome together!"
 
     Ready to dive in? Perfect! By the end of this guide, you'll have created, tested, and deployed your very first bash-based GitHub Action.
 
-## 🎯 What You'll Build
+## What You'll Build
 
 We'll create a **Text Processor Action** that:
 
@@ -13,11 +13,11 @@ We'll create a **Text Processor Action** that:
 - Outputs the processed result
 - Includes proper logging and error handling
 
-## 📋 Prerequisites
+## Prerequisites
 
 !!! info "What you need" - A GitHub account - VS Code with Dev Containers extension (recommended) - 10 minutes of focused time
 
-## 🛠️ Step 1: Set Up Your Workspace
+## Step 1: Set Up Your Workspace
 
 ### Option A: DevContainer (Recommended)
 
@@ -29,14 +29,14 @@ We'll create a **Text Processor Action** that:
 
 1. **Clone the repository**:
 
-   git clone https://github.com/your-username/bash-action-template.git
+   git clone <https://github.com/your-username/bash-action-template.git>
    cd bash-action-template
 
 2. **Make scripts executable**:
 
    chmod +x scripts/\*.sh
 
-## 🎨 Step 2: Understand the Action Structure
+## Step 2: Understand the Action Structure
 
 Before we modify anything, let's understand what we're working with:
 
@@ -49,7 +49,7 @@ Before we modify anything, let's understand what we're working with:
 
 The `action.yml` defines your action's interface (inputs/outputs), while `scripts/main.sh` contains the actual logic.
 
-## ✏️ Step 3: Customize Your Action
+## Step 3: Customize Your Action
 
 ### Update Action Metadata
 
@@ -113,7 +113,7 @@ Now let's update `scripts/main.sh` to implement our text processing logic:
 
     main "$@"
 
-## 🧪 Step 4: Test Your Action Locally
+## Step 4: Test Your Action Locally
 
 Let's test our action before deploying it:
 
@@ -141,7 +141,7 @@ You should see:
 
     processed-text=HELLO WORLD
 
-## 🚀 Step 5: Deploy and Use Your Action
+## Step 5: Deploy and Use Your Action
 
 ### Create a Test Workflow
 
@@ -182,21 +182,20 @@ Create `.github/workflows/test-my-action.yml`:
     git commit -m "feat: create custom text processor action"
     git push origin main
 
-## 🎉 Congratulations
+## Congratulations
 
 !!! success "You've done it!"
 In just 10 minutes, you've created a fully functional GitHub Action!
 
-## 🚀 What's Next?
+## What's Next?
 
 Now that you have the basics down, explore:
 
-- **[Advanced Features](../../features/index.md)**: Add more sophisticated processing
-- **[Custom Inputs/Outputs](../../extending/custom-io.md)**: Make your action more flexible
-- **[Testing Strategies](../../features/testing-ci.md)**: Ensure reliability
-- **[Real Examples](../../examples/index.md)**: See what others have built
+- **[Forking & Customizing](forking-and-customizing.md)**: Adapt the template to your needs
+- **[Runbooks](../runbooks/quick-fixes.md)**: Common solutions and maintenance
+- **[Contributing](../contributing.md)**: Help improve the template
 
 ---
 
-[:fontawesome-solid-forward: Explore Advanced Features](../../features/index.md){ .md-button }
-[:fontawesome-solid-question: Need Help?](../../troubleshooting/common-issues.md){ .md-button }
+[:fontawesome-solid-forward: Explore Forking & Customizing](forking-and-customizing.md){ .md-button }
+[:fontawesome-solid-question: Need Help?](../runbooks/quick-fixes.md){ .md-button }

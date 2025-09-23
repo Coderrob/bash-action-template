@@ -1,30 +1,45 @@
-#==============================================================================
-#
-#    Copyright (C) 2025 Robert Lindley
-#
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    You should have received a copy of the GNU General Public License
-#    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-#
-#==============================================================================
+# ==============================================================================
 
+#
 
+# Copyright (C) 2025 Robert Lindley
 
-# 🔀 Forking and Customizing Your Action
+#
+
+# This program is free software: you can redistribute it and/or modify
+
+# it under the terms of the GNU General Public License as published by
+
+# the Free Software Foundation, either version 3 of the License, or
+
+# (at your option) any later version
+
+#
+
+# This program is distributed in the hope that it will be useful
+
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+
+# GNU General Public License for more details
+
+#
+
+# You should have received a copy of the GNU General Public License
+
+# along with this program. If not, see <https://www.gnu.org/licenses/>
+
+#
+
+# ==============================================================================
+
+# Forking and Customizing Your Action
 
 !!! info "Ready to make this template your own?"
 This guide walks you through forking the repository and customizing it for your specific needs, including publishing your own GitHub Action.
 
-## 🎯 Why Fork This Template?
+## Why Fork This Template?
 
 Forking this template gives you:
 
@@ -34,7 +49,7 @@ Forking this template gives you:
 - **Publishing rights** for your own GitHub Marketplace listing
 - **Community contributions** back to the original project
 
-## 📋 Forking Process
+## Forking Process
 
 ### Step 1: Create Your Fork
 
@@ -65,7 +80,7 @@ docker-compose up -d
 # Open the project and click "Reopen in Container" when prompted
 ```
 
-## 🛠️ Customization Guide
+## Customization Guide
 
 ### Basic Customization
 
@@ -170,7 +185,7 @@ if [[ -z "$ANOTHER_INPUT" ]]; then
 fi
 ```
 
-## 📦 Publishing Your Action
+## Publishing Your Action
 
 ### Step 1: Prepare for Release
 
@@ -196,7 +211,6 @@ fi
    ```
 
 3. **Update documentation**:
-
    - Ensure all examples work with your changes
    - Update changelog
    - Review and update README
@@ -213,14 +227,13 @@ fi
 
 1. **Enable Marketplace** in repository settings
 2. **Create marketplace listing**:
-
    - Go to **Settings** → **Developer settings** → **GitHub Apps**
    - Create a new GitHub App for your action
    - Configure the marketplace listing
 
 3. **Submit for review** (if required for verified badge)
 
-## 🔄 Staying Updated
+## Staying Updated
 
 ### Syncing with Upstream
 
@@ -231,7 +244,6 @@ Regularly sync your fork with the original repository:
 git fetch upstream
 
 # Merge changes into your main branch
-git checkout main
 git merge upstream/main
 
 # Resolve any conflicts and push
@@ -247,7 +259,7 @@ Consider contributing improvements back to the original project:
 3. Create a pull request to the upstream repository
 4. Engage with maintainers for feedback
 
-## 🧪 Testing Your Custom Action
+## Testing Your Custom Action
 
 ### Local Testing
 
@@ -282,7 +294,7 @@ jobs:
           custom_input: "test value"
 ```
 
-## 🎨 Branding and Documentation
+## Branding and Documentation
 
 ### Custom Branding
 
@@ -306,7 +318,7 @@ docs/
 └── contributing/           # How to contribute
 ```
 
-## 🚀 Best Practices for Custom Actions
+## Best Practices for Custom Actions
 
 ### Code Quality
 
@@ -336,7 +348,7 @@ docs/
 - **Document complex logic** with comments
 - **Version your releases** properly
 
-## 🆘 Getting Help
+## Getting Help
 
 ### Community Support
 
@@ -357,5 +369,5 @@ If you need help with customization or have specific requirements:
 !!! success "Ready to customize?"
 You've got the power to create amazing GitHub Actions. Start small, iterate often, and don't hesitate to ask for help. The automation community is incredibly supportive!
 
-[:fontawesome-solid-arrow-left: Back to Getting Started](../getting-started/index.md){ .md-button }
-[:fontawesome-solid-play: Quick Start](../getting-started/quick-start.md){ .md-button .md-button--primary }
+[:fontawesome-solid-arrow-left: Back to Getting Started](index.md){ .md-button }
+[:fontawesome-solid-play: Quick Start](quick-start.md){ .md-button .md-button--primary }
