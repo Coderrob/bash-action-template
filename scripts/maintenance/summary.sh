@@ -25,8 +25,8 @@
 set -euo pipefail
 
 # Source core library for shared functionality
-# shellcheck source=./core.sh
-source "$(dirname "${BASH_SOURCE[0]}")/core.sh"
+# shellcheck source=../lib/core.sh
+source "$(dirname "${BASH_SOURCE[0]}")/../lib/core.sh"
 
 # Summary data structure
 declare -A SUMMARY_DATA

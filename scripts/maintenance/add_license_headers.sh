@@ -25,10 +25,10 @@
 set -euo pipefail
 
 # Source utility functions
-# shellcheck source=./utils.sh
-source "$(dirname "${BASH_SOURCE[0]}")/utils.sh"
-# shellcheck source=./script_init.sh
-source "$(dirname "${BASH_SOURCE[0]}")/script_init.sh"
+# shellcheck source=../lib/utils.sh
+source "$(dirname "${BASH_SOURCE[0]}")/../lib/utils.sh"
+# shellcheck source=../lib/script_init.sh
+source "$(dirname "${BASH_SOURCE[0]}")/../lib/script_init.sh"
 
 # Initialize script
 init_script "add_license_headers" "info" "true"

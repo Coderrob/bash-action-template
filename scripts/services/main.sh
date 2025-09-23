@@ -55,12 +55,12 @@
 #==============================================================================
 
 # Source the core library (provides logging, constants, and shared functionality)
-# shellcheck source=./core.sh
-source "$(dirname "${BASH_SOURCE[0]}")/core.sh"
+# shellcheck source=./lib/core.sh
+source "$(dirname "${BASH_SOURCE[0]}")/lib/core.sh"
 
 # Source common argument parsing utilities
-# shellcheck source=./common_args.sh
-source "$(dirname "${BASH_SOURCE[0]}")/common_args.sh"
+# shellcheck source=./lib/common_args.sh
+source "$(dirname "${BASH_SOURCE[0]}")/lib/common_args.sh"
 
 # Readonly global constants (immutable by design)
 readonly ACTION_NAME="bash-action-template"
@@ -105,7 +105,7 @@ handle_error() {
     log_error "error" "${message}" "exit_code=${exit_code}"
 
     # Set GitHub Actions output for execution time
-    local execution_time=$(( $(date +%s) - SCRIPT_START_TIME ))
+    local execution_time=$(($(date +%s) - SCRIPT_START_TIME))
     set_output "execution-time" "${execution_time}"
 
     exit "${exit_code}"
@@ -116,7 +116,7 @@ handle_exit() {
     local exit_code="$?"
 
     # Set GitHub Actions output for execution time
-    local execution_time=$(( $(date +%s) - SCRIPT_START_TIME ))
+    local execution_time=$(($(date +%s) - SCRIPT_START_TIME))
     set_output "execution-time" "${execution_time}"
 
     log_debug "cleanup" "Script exiting" "exit_code=${exit_code}"

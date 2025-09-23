@@ -52,25 +52,25 @@
 #   ✓ Failure isolation and recovery
 #
 # Dependencies:
-#   - init.sh (centralized initialization)
-#   - functional_utils.sh (pure function library)
+#   - core.sh (shared functionality and constants)
+#   - script_init.sh (standardized script initialization)
 #   - All scripts under test
 #==============================================================================
 
-# Source the initialization utility
-# shellcheck source=../scripts/init.sh
-source "$(dirname "${BASH_SOURCE[0]}")/../scripts/init.sh"
+# Source the core library (provides shared functionality)
+# shellcheck source=../scripts/lib/core.sh
+source "$(dirname "${BASH_SOURCE[0]}")/../scripts/lib/core.sh"
 
-# Source functional utilities
-# shellcheck source=../scripts/functional_utils.sh
-source "$(dirname "${BASH_SOURCE[0]}")/../scripts/functional_utils.sh"
+# Source script initialization library
+# shellcheck source=../scripts/lib/script_init.sh
+source "$(dirname "${BASH_SOURCE[0]}")/../scripts/lib/script_init.sh"
 
 # Define test script directory for test output
 readonly TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly TEST_OUTPUT_DIR="/tmp/bash_action_test_$$"
 
 # Test framework constants (immutable)
 readonly TEST_FRAMEWORK_VERSION="2.0.0"
-readonly TEST_OUTPUT_DIR="${TEST_SCRIPT_DIR}/output"
 
 # Test state tracking
 declare -a FAILED_TESTS
@@ -91,44 +91,44 @@ create_assertion() {
     local assertion_type="${4:-equals}"
 
     case "$assertion_type" in
-        equals)
-            if [[ "$expected" == "$actual" ]]; then
-                echo "$TEST_RESULT_PASS"
-            else
-                echo "$TEST_RESULT_FAIL"
-            fi
-            ;;
-        not_equals)
-            if [[ "$expected" != "$actual" ]]; then
-                echo "$TEST_RESULT_PASS"
-            else
-                echo "$TEST_RESULT_FAIL"
-            fi
-            ;;
-        contains)
-            if string_contains "$actual" "$expected"; then
-                echo "$TEST_RESULT_PASS"
-            else
-                echo "$TEST_RESULT_FAIL"
-            fi
-            ;;
-        not_empty)
-            if [[ -n "$actual" ]]; then
-                echo "$TEST_RESULT_PASS"
-            else
-                echo "$TEST_RESULT_FAIL"
-            fi
-            ;;
-        file_exists)
-            if [[ -f "$actual" ]]; then
-                echo "$TEST_RESULT_PASS"
-            else
-                echo "$TEST_RESULT_FAIL"
-            fi
-            ;;
-        *)
+    equals)
+        if [[ "$expected" == "$actual" ]]; then
+            echo "$TEST_RESULT_PASS"
+        else
             echo "$TEST_RESULT_FAIL"
-            ;;
+        fi
+        ;;
+    not_equals)
+        if [[ "$expected" != "$actual" ]]; then
+            echo "$TEST_RESULT_PASS"
+        else
+            echo "$TEST_RESULT_FAIL"
+        fi
+        ;;
+    contains)
+        if string_contains "$actual" "$expected"; then
+            echo "$TEST_RESULT_PASS"
+        else
+            echo "$TEST_RESULT_FAIL"
+        fi
+        ;;
+    not_empty)
+        if [[ -n "$actual" ]]; then
+            echo "$TEST_RESULT_PASS"
+        else
+            echo "$TEST_RESULT_FAIL"
+        fi
+        ;;
+    file_exists)
+        if [[ -f "$actual" ]]; then
+            echo "$TEST_RESULT_PASS"
+        else
+            echo "$TEST_RESULT_FAIL"
+        fi
+        ;;
+    *)
+        echo "$TEST_RESULT_FAIL"
+        ;;
     esac
 }
 
@@ -141,22 +141,22 @@ format_test_result() {
     local color_code status_symbol
 
     case "$result" in
-        "$TEST_RESULT_PASS")
-            color_code='\033[0;32m'  # Green
-            status_symbol="✓"
-            ;;
-        "$TEST_RESULT_FAIL")
-            color_code='\033[0;31m'  # Red
-            status_symbol="✗"
-            ;;
-        "$TEST_RESULT_SKIP")
-            color_code='\033[1;33m'  # Yellow
-            status_symbol="○"
-            ;;
-        *)
-            color_code='\033[0m'     # No color
-            status_symbol="?"
-            ;;
+    "$TEST_RESULT_PASS")
+        color_code='\033[0;32m' # Green
+        status_symbol="✓"
+        ;;
+    "$TEST_RESULT_FAIL")
+        color_code='\033[0;31m' # Red
+        status_symbol="✗"
+        ;;
+    "$TEST_RESULT_SKIP")
+        color_code='\033[1;33m' # Yellow
+        status_symbol="○"
+        ;;
+    *)
+        color_code='\033[0m' # No color
+        status_symbol="?"
+        ;;
     esac
 
     local formatted_output="${color_code}${status_symbol} ${result}${COLOR_NC} ${test_name}"
@@ -197,8 +197,12 @@ run_test() {
 
     # Execute test in a subshell to isolate environment
     local test_result test_output exit_code
-    test_output="$("$test_function" 2>&1)"
-    exit_code=$?
+    local temp_output="/tmp/test_output_$$"
+    local exit_file="/tmp/exit_code_$$"
+    (set +e; eval "$test_function > \"$temp_output\" 2>&1"; echo $? > "$exit_file") 2>/dev/null
+    exit_code="$(cat "$exit_file")"
+    test_output="$(cat "$temp_output")"
+    rm -f "$temp_output" "$exit_file"
 
     test_end_time="$(date +%s)"
     test_duration="$((test_end_time - test_start_time))"
@@ -223,6 +227,8 @@ run_test() {
     fi
 
     format_test_result "$test_result" "$test_name" "$result_message"
+
+    echo "Test $test_name: $test_result" >&2
 
     # Log detailed output in debug mode
     if [[ -n "$test_output" ]]; then
@@ -315,10 +321,12 @@ test_file_existence() {
     # Check if main files exist
     local required_files=(
         "action.yml"
-        "scripts/main.sh"
-        "scripts/utils.sh"
-        "scripts/init.sh"
-        "scripts/functional_utils.sh"
+        "scripts/services/main.sh"
+        "scripts/lib/utils.sh"
+        "scripts/lib/core.sh"
+        "scripts/lib/constants.sh"
+        "scripts/lib/common_args.sh"
+        "scripts/lib/script_init.sh"
         ".shellcheckrc"
         ".editorconfig"
     )
@@ -339,14 +347,15 @@ test_file_existence() {
 test_script_permissions() {
     local script_dir="${TEST_SCRIPT_DIR}/../scripts"
 
-    for script in "${script_dir}"/*.sh; do
+    # Find all shell scripts under scripts/ recursively and ensure they are executable
+    while IFS= read -r -d '' script; do
         if [[ -x "${script}" ]]; then
             continue
         else
-            log_error "test" "Script not executable: $(basename "$script")"
+            log_error "test" "Script not executable: ${script#${script_dir}/}"
             return 1
         fi
-    done
+    done < <(find "${script_dir}" -name "*.sh" -type f -print0)
 
     return 0
 }
@@ -381,7 +390,7 @@ test_basic_execution() {
     export GITHUB_OUTPUT="${temp_output_file}"
 
     # Test the main script (but don't actually run it to avoid side effects)
-    if [[ -f "${TEST_SCRIPT_DIR}/../scripts/main.sh" ]]; then
+    if [[ -f "${TEST_SCRIPT_DIR}/../scripts/services/main.sh" ]]; then
         log_debug "test" "Main script exists and is readable"
         return 0
     else
@@ -449,6 +458,7 @@ generate_test_report() {
 
     echo "Success Rate: ${success_rate}%"
     echo "=========================================="
+    # log_info "test_summary" "Test suite completed" "total=${TESTS_RUN},passed=${#PASSED_TESTS[@]},failed=${#FAILED_TESTS[@]},skipped=${#SKIPPED_TESTS[@]}"
 
     # Return appropriate exit code
     if [[ $failed_count -eq 0 ]]; then
@@ -473,7 +483,7 @@ cleanup() {
 # Main test execution function
 main() {
     # Initialize script with test-specific settings
-    init_script "debug" "false" "false"
+    init_script "test_runner" "debug" "false"
 
     log_group_start "Test Suite v${TEST_FRAMEWORK_VERSION}"
 
@@ -500,5 +510,13 @@ main() {
     exit $test_exit_code
 }
 
+# Export test functions for use in subshells
+export -f test_string_functions
+export -f test_file_existence
+export -f test_script_permissions
+export -f test_utility_functions
+export -f test_basic_execution
+
 # Execute main function
+export -f main
 main "$@"

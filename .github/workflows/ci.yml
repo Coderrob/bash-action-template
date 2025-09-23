@@ -11,7 +11,7 @@ jobs:
   lint:
     name: Lint Shell Scripts
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -42,26 +42,62 @@ jobs:
   format:
     name: Check Shell Formatting
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup shfmt
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+
+      - name: Install shfmt
         run: |
-          curl -L "https://github.com/mvdan/sh/releases/latest/download/shfmt_linux_amd64" -o shfmt
-          chmod +x shfmt
-          sudo mv shfmt /usr/local/bin/
+          go install mvdan.cc/sh/v3/cmd/shfmt@latest
+          echo "$HOME/go/bin" >> $GITHUB_PATH
+
+      - name: Verify shfmt installation
+        run: |
+          shfmt --version
 
       - name: Check formatting
         run: |
           echo "Checking shell script formatting..."
-          find . -name "*.sh" -type f | xargs shfmt -l -d
+          # Find all shell scripts and check formatting
+          shell_scripts=$(find . -name "*.sh" -type f -not -path "./.git/*")
+
+          if [ -z "$shell_scripts" ]; then
+            echo "No shell scripts found to check"
+            exit 0
+          fi
+
+          echo "Found shell scripts:"
+          echo "$shell_scripts"
+
+          # Check formatting for each script
+          format_issues=0
+          while IFS= read -r script; do
+            echo "Checking: $script"
+            if ! shfmt -l -d "$script"; then
+              echo "❌ Formatting issues found in: $script"
+              format_issues=$((format_issues + 1))
+            fi
+          done <<< "$shell_scripts"
+
+          if [ $format_issues -gt 0 ]; then
+            echo ""
+            echo "❌ Found formatting issues in $format_issues script(s)"
+            echo "To fix formatting, run: shfmt -w \$(find . -name '*.sh' -not -path './.git/*')"
+            exit 1
+          else
+            echo "✅ All shell scripts are properly formatted"
+          fi
 
   test:
     name: Test Action
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -86,13 +122,13 @@ jobs:
           echo "Default execution time: ${{ steps.test-default.outputs.execution-time }}"
           echo "Custom test output: ${{ steps.test-custom.outputs.example-output }}"
           echo "Custom execution time: ${{ steps.test-custom.outputs.execution-time }}"
-          
+
           # Verify outputs are not empty
           if [[ -z "${{ steps.test-default.outputs.example-output }}" ]]; then
             echo "Error: Default test output is empty"
             exit 1
           fi
-          
+
           if [[ -z "${{ steps.test-custom.outputs.example-output }}" ]]; then
             echo "Error: Custom test output is empty"
             exit 1
@@ -101,7 +137,7 @@ jobs:
   security:
     name: Security Scan
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -110,17 +146,17 @@ jobs:
         run: |
           # Check for common security issues in shell scripts
           echo "Checking for potential security issues..."
-          
+
           # Check for hardcoded secrets
           if grep -r -i "password\|secret\|key\|token" scripts/ --include="*.sh" | grep -v "INPUT_"; then
             echo "Warning: Potential hardcoded secrets found"
           fi
-          
+
           # Check for eval usage
           if grep -r "eval" scripts/ --include="*.sh"; then
             echo "Warning: eval usage found - review for security implications"
           fi
-          
+
           # Check for curl without verification
           if grep -r "curl.*-k\|curl.*--insecure" scripts/ --include="*.sh"; then
             echo "Error: Insecure curl usage found"
@@ -130,7 +166,7 @@ jobs:
   validate-action:
     name: Validate Action Metadata
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -138,25 +174,25 @@ jobs:
       - name: Validate action.yml
         run: |
           echo "Validating action.yml structure..."
-          
+
           # Check if action.yml exists
           if [[ ! -f "action.yml" ]]; then
             echo "Error: action.yml not found"
             exit 1
           fi
-          
+
           # Basic YAML syntax check
           python3 -c "import yaml; yaml.safe_load(open('action.yml'))" || {
             echo "Error: action.yml has invalid YAML syntax"
             exit 1
           }
-          
+
           echo "action.yml validation passed"
 
       - name: Check required files
         run: |
           echo "Checking for required files..."
-          
+
           required_files=(
             "action.yml"
             "README.md"
@@ -164,12 +200,12 @@ jobs:
             "scripts/main.sh"
             "scripts/utils.sh"
           )
-          
+
           for file in "${required_files[@]}"; do
             if [[ ! -f "$file" ]]; then
               echo "Error: Required file missing: $file"
               exit 1
             fi
           done
-          
+
           echo "All required files present"

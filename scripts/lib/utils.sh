@@ -1,13 +1,8 @@
-#!/bin/bash#!/bin/bash
+#!/bin/bash
 
-
-
-# Compatibility shim: source the relocated library in scripts/lib#==============================================================================
-
-# shellcheck source=./lib/utils.sh#
-
-source "$(dirname "${BASH_SOURCE[0]}")/lib/utils.sh"#    Copyright (C) 2025 Robert Lindley
-
+#==============================================================================
+#
+#    Copyright (C) 2025 Robert Lindley
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by

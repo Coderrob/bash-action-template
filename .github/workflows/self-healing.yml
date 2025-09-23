@@ -9,7 +9,7 @@ on:
       force_update:
         description: 'Force update even if no changes detected'
         required: false
-        default: 'false'
+        default: false
         type: boolean
       license_header:
         description: 'License header to add to source files'
@@ -56,12 +56,10 @@ jobs:
       - name: Check for changes
         id: check_changes
         run: |
-          if [[ -n "$(git status --porcelain)" || "${{ inputs.force_update }}" == "true" ]]; then
-            echo "changes=true" >> $GITHUB_OUTPUT
-            echo "Changes detected or force update requested"
+          if [[ "${{ inputs.force_update }}" == "true" ]]; then
+            ./scripts/check_changes.sh --force
           else
-            echo "changes=false" >> $GITHUB_OUTPUT
-            echo "No changes detected"
+            ./scripts/check_changes.sh
           fi
 
       - name: Commit and push changes

@@ -36,13 +36,11 @@ jobs:
 
       - name: Verify Default Output
         run: |
-          echo "Action output: ${{ steps.test-default.outputs.example-output }}"
-          if [[ "${{ steps.test-default.outputs.example-output }}" == "TEST-VALUE" ]]; then
-            echo "✓ Default test passed"
-          else
-            echo "✗ Default test failed"
-            exit 1
-          fi
+          ./scripts/verify_action_output.sh \
+            --test-name "default" \
+            --input "${{ inputs.example_input || 'test-value' }}" \
+            "${{ steps.test-default.outputs.example-output }}" \
+            "TEST-VALUE"
 
       - name: Test Action with Custom Inputs
         id: test-custom
@@ -53,13 +51,11 @@ jobs:
 
       - name: Verify Custom Output
         run: |
-          echo "Action output: ${{ steps.test-custom.outputs.example-output }}"
-          if [[ "${{ steps.test-custom.outputs.example-output }}" == "CUSTOM-TEST-INPUT" ]]; then
-            echo "✓ Custom test passed"
-          else
-            echo "✗ Custom test failed"
-            exit 1
-          fi
+          ./scripts/verify_action_output.sh \
+            --test-name "custom" \
+            --input "custom-test-input" \
+            "${{ steps.test-custom.outputs.example-output }}" \
+            "CUSTOM-TEST-INPUT"
 
   test-matrix:
     runs-on: ubuntu-latest
@@ -92,10 +88,8 @@ jobs:
 
       - name: Verify Matrix Output
         run: |
-          echo "Input: '${{ matrix.example_input }}' -> Output: '${{ steps.test-matrix.outputs.example-output }}' (Expected: '${{ matrix.expected }}')"
-          if [[ "${{ steps.test-matrix.outputs.example-output }}" == "${{ matrix.expected }}" ]]; then
-            echo "✓ Matrix test passed for input: ${{ matrix.example_input }}"
-          else
-            echo "✗ Matrix test failed for input: ${{ matrix.example_input }}"
-            exit 1
-          fi
+          ./scripts/verify_action_output.sh \
+            --test-name "matrix" \
+            --input "${{ matrix.example_input }}" \
+            "${{ steps.test-matrix.outputs.example-output }}" \
+            "${{ matrix.expected }}"
