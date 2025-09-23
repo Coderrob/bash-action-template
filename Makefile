@@ -79,10 +79,10 @@ pre-commit-update: ## Update pre-commit hooks
 validate: ## Validate action.yml and required files
 	@echo "Validating action structure..."
 	@python3 -c "import yaml; yaml.safe_load(open('action.yml'))" && echo "✓ action.yml is valid YAML"
-	@test -f scripts/main.sh && echo "✓ scripts/main.sh exists"
-	@test -x scripts/main.sh && echo "✓ scripts/main.sh is executable"
-	@test -f scripts/utils.sh && echo "✓ scripts/utils.sh exists"
-	@test -x scripts/utils.sh && echo "✓ scripts/utils.sh is executable"
+	@test -f scripts/services/main.sh && echo "✓ scripts/services/main.sh exists"
+	@test -x scripts/services/main.sh && echo "✓ scripts/services/main.sh is executable"
+	@test -f scripts/lib/utils.sh && echo "✓ scripts/lib/utils.sh exists"
+	@test -x scripts/lib/utils.sh && echo "✓ scripts/lib/utils.sh is executable"
 	@test -f .shellcheckrc && echo "✓ .shellcheckrc exists"
 	@test -f .editorconfig && echo "✓ .editorconfig exists"
 	@test -f .github/workflows/ci.yml && echo "✓ CI workflow exists"
@@ -241,7 +241,7 @@ test-action: ## Test the action with CI-like inputs
 	 export INPUT_LOG_LEVEL="info" && \
 	 export INPUT_WORKING_DIRECTORY="." && \
 	 export GITHUB_OUTPUT="/tmp/github_output_test_default" && \
-	 ./scripts/main.sh > /tmp/action_test_default.log 2>&1 && \
+	 ./scripts/services/main.sh > /tmp/action_test_default.log 2>&1 && \
 	 echo "✓ Default test passed" || (echo "✗ Default test failed"; cat /tmp/action_test_default.log; exit 1)
 
 	@echo "Testing action with custom inputs..."
@@ -249,7 +249,7 @@ test-action: ## Test the action with CI-like inputs
 	 export INPUT_LOG_LEVEL="debug" && \
 	 export INPUT_WORKING_DIRECTORY="." && \
 	 export GITHUB_OUTPUT="/tmp/github_output_test_custom" && \
-	 ./scripts/main.sh > /tmp/action_test_custom.log 2>&1 && \
+	 ./scripts/services/main.sh > /tmp/action_test_custom.log 2>&1 && \
 	 echo "✓ Custom test passed" || (echo "✗ Custom test failed"; cat /tmp/action_test_custom.log; exit 1)
 
 	@echo "Verifying outputs..."

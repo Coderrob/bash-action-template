@@ -59,7 +59,7 @@ add_license_headers() {
     log_info "license" "Starting license header check and update"
 
     # Check if LICENSE file exists
-    if [[ ! -f "$LICENSE_FILE" ]]; then
+    if [[ ! -f "${LICENSE_FILE}" ]]; then
         log_warn "license" "LICENSE file not found, skipping license header updates"
         return 0
     fi
@@ -69,39 +69,39 @@ add_license_headers() {
     # Find source files that should have license headers
     while IFS= read -r -d '' file; do
         # Skip if file already has a license header
-        if head -20 "$file" | grep -q "GNU General Public License"; then
-            log_debug "license" "File already has license header: $file"
+        if head -20 "${file}" | grep -q "GNU General Public License"; then
+            log_debug "license" "File already has license header: ${file}"
             continue
         fi
 
         # Skip binary files and certain file types
-        if [[ "$file" =~ \.(png|jpg|jpeg|gif|ico|svg|pdf|zip|tar\.gz|woff|woff2|eot|ttf)$ ]]; then
+        if [[ "${file}" =~ \.(png|jpg|jpeg|gif|ico|svg|pdf|zip|tar\.gz|woff|woff2|eot|ttf)$ ]]; then
             continue
         fi
 
         # Skip certain directories
-        if [[ "$file" =~ ^(\.git|node_modules|build|dist)/ ]]; then
+        if [[ "${file}" =~ ^(\.git|node_modules|build|dist)/ ]]; then
             continue
         fi
 
-        log_info "license" "Adding license header to: $file"
+        log_info "license" "Adding license header to: ${file}"
 
         # Create a temporary file with header + original content
         {
-            echo "$HEADER_TEMPLATE"
+            echo "${HEADER_TEMPLATE}"
             echo ""
-            cat "$file"
+            cat "${file}"
         } >"${file}.tmp"
 
         # Move temporary file back
-        mv "${file}.tmp" "$file"
+        mv "${file}.tmp" "${file}"
 
         ((files_updated++))
-    done < <(find . -type f -name "*.sh" -o -name "*.py" -o -name "*.js" -o -name "*.ts" -o -name "*.java" -o -name "*.md" -print0 2>/dev/null)
+    done < <(find . -type f \( -name "*.sh" -o -name "*.py" -o -name "*.js" -o -name "*.ts" -o -name "*.java" -o -name "*.md" \) -print0 2>/dev/null)
 
     log_info "license" "License header update completed" "files_updated=${files_updated}"
 
-    if [[ $files_updated -gt 0 ]]; then
+    if [[ ${files_updated} -gt 0 ]]; then
         return 0
     else
         return 1 # No changes made

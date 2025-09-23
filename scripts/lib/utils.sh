@@ -188,9 +188,7 @@ check_github_rate_limit() {
     fi
 
     local response
-    response="$(curl -s -H "Authorization: token ${GITHUB_TOKEN}" -H "Accept: application/vnd.github.v3+json" "https://api.github.com/rate_limit")"
-
-    if [[ $? -ne 0 ]]; then
+    if ! response="$(curl -s -H "Authorization: token ${GITHUB_TOKEN}" -H "Accept: application/vnd.github.v3+json" "https://api.github.com/rate_limit")"; then
         log_warn "rate-limit" "Failed to check GitHub API rate limit"
         return 0
     fi
@@ -253,7 +251,7 @@ validate_not_empty() {
 # Usage: validate_required "variable_name" ["error_message"]
 validate_required() {
     local var_name="$1"
-    local error_msg="${2:-Required variable '${var_name}' is not set}"
+    local error_msg="${2:-Required variable ${var_name} is not set}"
 
     local var_value="${!var_name:-}"
 
@@ -269,7 +267,7 @@ validate_required() {
 # Usage: validate_array_not_empty "array_name" ["error_message"]
 validate_array_not_empty() {
     local array_name="$1"
-    local error_msg="${2:-Array '${array_name}' cannot be empty}"
+    local error_msg="${2:-Array ${array_name} cannot be empty}"
 
     # Use indirect expansion to get array length
     local array_length
@@ -287,7 +285,7 @@ validate_array_not_empty() {
 # Usage: validate_file_exists "file_path" ["error_message"]
 validate_file_exists() {
     local file_path="$1"
-    local error_msg="${2:-File '${file_path}' does not exist or is not readable}"
+    local error_msg="${2:-File ${file_path} does not exist or is not readable}"
 
     if [[ ! -f "${file_path}" || ! -r "${file_path}" ]]; then
         log_error "validation" "${error_msg}"
@@ -301,7 +299,7 @@ validate_file_exists() {
 # Usage: validate_directory_exists "dir_path" ["error_message"]
 validate_directory_exists() {
     local dir_path="$1"
-    local error_msg="${2:-Directory '${dir_path}' does not exist or is not accessible}"
+    local error_msg="${2:-Directory ${dir_path} does not exist or is not accessible}"
 
     if [[ ! -d "${dir_path}" ]]; then
         log_error "validation" "${error_msg}"
@@ -315,7 +313,7 @@ validate_directory_exists() {
 # Usage: validate_command_available "command_name" ["error_message"]
 validate_command_available() {
     local cmd_name="$1"
-    local error_msg="${2:-Command '${cmd_name}' is not available}"
+    local error_msg="${2:-Command ${cmd_name} is not available}"
 
     if ! command -v "${cmd_name}" >/dev/null 2>&1; then
         log_error "validation" "${error_msg}"
@@ -331,7 +329,7 @@ validate_numeric_range() {
     local value="$1"
     local min_value="$2"
     local max_value="$3"
-    local error_msg="${4:-Value '${value}' must be between ${min_value} and ${max_value}}"
+    local error_msg="${4:-Value ${value} must be between ${min_value} and ${max_value}}"
 
     if ! [[ "${value}" =~ ^[0-9]+$ ]] || [[ ${value} -lt ${min_value} ]] || [[ ${value} -gt ${max_value} ]]; then
         log_error "validation" "${error_msg}"
@@ -347,7 +345,7 @@ validate_numeric_range() {
 validate_in_list() {
     local value="$1"
     local allowed_values="$2"
-    local error_msg="${3:-Value '${value}' is not in allowed list: ${allowed_values}}"
+    local error_msg="${3:-Value ${value} is not in allowed list: ${allowed_values}}"
 
     for allowed in ${allowed_values}; do
         if [[ "${value}" == "${allowed}" ]]; then

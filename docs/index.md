@@ -57,9 +57,9 @@ Explore our [Runbooks](runbooks/quick-fixes.md) for practical procedures and mai
     ```mermaid
     graph TB
         A[GitHub Event] --> B[action.yml]
-        B --> C[scripts/main.sh]
-        C --> D[scripts/utils.sh]
-        C --> E[scripts/summary.sh]
+        B --> C[scripts/services/main.sh]
+        C --> D[scripts/lib/utils.sh]
+        C --> E[scripts/maintenance/summary.sh]
 
         F[DevContainer] --> G[Development]
         G --> H[Testing with act]

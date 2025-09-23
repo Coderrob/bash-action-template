@@ -141,7 +141,7 @@ All contributions must pass:
    ```bash
    export INPUT_EXAMPLE_INPUT="test-value"
    export INPUT_LOG_LEVEL="debug"
-   ./scripts/main.sh
+   ./scripts/services/main.sh
    ```
 
 4. **Run the CI workflow locally** (if you have act installed):

@@ -54,7 +54,7 @@ export INPUT_EXAMPLE_INPUT="diagnostic-test"
 export INPUT_LOG_LEVEL="debug"
 export GITHUB_OUTPUT="/tmp/diagnostic-output"
 
-if ./scripts/main.sh; then
+if ./scripts/services/main.sh; then
     echo "✅ Local execution successful"
     cat /tmp/diagnostic-output
 else
@@ -93,7 +93,7 @@ ls -la scripts/
 ```bash
 # Step 1: Identify missing files
 echo "Checking for missing critical files..."
-critical_files=("action.yml" "scripts/main.sh" "scripts/utils.sh" "README.md")
+critical_files=("action.yml" "scripts/services/main.sh" "scripts/lib/utils.sh" "README.md")
 for file in "${critical_files[@]}"; do
     if [[ ! -f "$file" ]]; then
         echo "❌ Missing: $file"
@@ -199,7 +199,7 @@ recover_file() {
 }
 
 # Usage examples:
-# recover_file "scripts/main.sh"
+# recover_file "scripts/services/main.sh"
 # recover_file "action.yml" "HEAD~5"
 # recover_file "README.md" "abc123"  # specific commit
 ```
@@ -229,7 +229,7 @@ runs:
   using: 'composite'
   steps:
     - name: Run action
-      run: $GITHUB_ACTION_PATH/scripts/main.sh
+      run: $GITHUB_ACTION_PATH/scripts/services/main.sh
       shell: bash
       id: main
 EOF
@@ -240,7 +240,7 @@ EOF
 # Reconstruct basic scripts
 reconstruct_scripts() {
     # Create basic main.sh
-    cat > scripts/main.sh << 'EOF'
+    cat > scripts/services/main.sh << 'EOF'
 #!/bin/bash
 set -euo pipefail
 
@@ -256,7 +256,7 @@ main() {
 main "$@"
 EOF
 
-    chmod +x scripts/main.sh
+    chmod +x scripts/services/main.sh
     echo "✅ Basic scripts reconstructed"
 }
 
@@ -281,7 +281,7 @@ validate_recovery() {
         echo "❌ action.yml missing"; ((issues++))
     fi
 
-    if [[ ! -x "scripts/main.sh" ]]; then
+    if [[ ! -x "scripts/services/main.sh" ]]; then
         echo "❌ main.sh not executable"; ((issues++))
     fi
 
@@ -291,7 +291,7 @@ validate_recovery() {
     fi
 
     # Test execution
-    if ! export INPUT_EXAMPLE_INPUT="test" GITHUB_OUTPUT="/tmp/test-output" && ./scripts/main.sh >/dev/null 2>&1; then
+    if ! export INPUT_EXAMPLE_INPUT="test" GITHUB_OUTPUT="/tmp/test-output" && ./scripts/services/main.sh >/dev/null 2>&1; then
         echo "❌ Action execution failed"; ((issues++))
     fi
 
@@ -321,7 +321,7 @@ performance_test() {
     for i in {1..10}; do
         export INPUT_EXAMPLE_INPUT="perf-test-$i"
         export GITHUB_OUTPUT="/tmp/perf-output-$i"
-        ./scripts/main.sh >/dev/null 2>&1
+        ./scripts/services/main.sh >/dev/null 2>&1
     done
     end_time=$(date +%s%N)
 

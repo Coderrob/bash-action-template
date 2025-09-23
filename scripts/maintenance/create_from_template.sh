@@ -48,7 +48,8 @@ source "$(dirname "${BASH_SOURCE[0]}")/../lib/script_init.sh"
 init_script "create_from_template" "info" "true"
 
 # Configuration
-readonly TEMPLATES_DIR="$(dirname "${BASH_SOURCE[0]}")/../templates"
+templates_dir="$(dirname "${BASH_SOURCE[0]}")/../templates"
+readonly TEMPLATES_DIR="${templates_dir}"
 readonly SCRIPT_VERSION="1.0.0"
 
 # Global variables
@@ -196,7 +197,7 @@ create_from_template() {
     if [[ -f "${OUTPUT_PATH}" ]]; then
         log_warn "template" "Output file already exists: ${OUTPUT_PATH}"
         read -p "Overwrite? (y/N): " -r
-        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        if [[ ! ${REPLY} =~ ^[Yy]$ ]]; then
             log_info "template" "Aborted by user"
             return 1
         fi

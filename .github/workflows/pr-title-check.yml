@@ -15,4 +15,4 @@ jobs:
 
       - name: Validate PR title format
         run: |
-          ./scripts/validate_pr_title.sh "${{ github.event.pull_request.title }}"
+          ./scripts/validation/validate_pr_title.sh "${{ github.event.pull_request.title }}"

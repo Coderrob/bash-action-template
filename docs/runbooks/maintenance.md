@@ -98,7 +98,7 @@ export INPUT_EXAMPLE_INPUT="benchmark-test"
 export INPUT_LOG_LEVEL="error"
 export GITHUB_OUTPUT="/tmp/benchmark-output"
 
-./scripts/main.sh >/dev/null 2>&1
+./scripts/services/main.sh >/dev/null 2>&1
 
 end_time=$(date +%s.%3N)
 execution_time=$(echo "$end_time - $start_time" | bc)

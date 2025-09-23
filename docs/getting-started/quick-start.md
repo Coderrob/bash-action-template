@@ -47,7 +47,7 @@ Before we modify anything, let's understand what we're working with:
     │   └── utils.sh       # Helper functions
     └── Makefile           # Build and test commands
 
-The `action.yml` defines your action's interface (inputs/outputs), while `scripts/main.sh` contains the actual logic.
+The `action.yml` defines your action's interface (inputs/outputs), while `scripts/services/main.sh` contains the actual logic.
 
 ## Step 3: Customize Your Action
 
@@ -72,7 +72,7 @@ First, let's personalize the action metadata in `action.yml`:
 
 ### Modify the Main Script
 
-Now let's update `scripts/main.sh` to implement our text processing logic:
+Now let's update `scripts/services/main.sh` to implement our text processing logic:
 
     #!/bin/bash
     set -euo pipefail
@@ -125,7 +125,7 @@ Let's test our action before deploying it:
     export GITHUB_OUTPUT="/tmp/action-output"
 
     # Run the action
-    ./scripts/main.sh
+    ./scripts/services/main.sh
 
 You should see output like:
 

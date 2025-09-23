@@ -52,7 +52,7 @@ parse_common_help_args() {
 
     case "${1:-}" in
     -h | --help)
-        "$show_usage_func"
+        "${show_usage_func}"
         exit "${EXIT_SUCCESS}"
         ;;
     --version)
@@ -90,7 +90,7 @@ handle_unknown_option() {
     local option="$1"
     local component="${2:-args}"
 
-    log_error "$component" "Unknown option: $option"
+    log_error "${component}" "Unknown option: ${option}"
     if [[ $(type -t show_usage) == function ]]; then
         show_usage >&2
     fi
@@ -146,7 +146,7 @@ parse_path_arg() {
     local path_type="${3:-}"
 
     # Expand tilde if present
-    path_value="${path_value/#\~/$HOME}"
+    path_value="${path_value/#\~/${HOME}}"
 
     # Convert to absolute path
     if [[ ! "${path_value}" =~ ^/ ]]; then

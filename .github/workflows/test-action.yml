@@ -36,7 +36,7 @@ jobs:
 
       - name: Verify Default Output
         run: |
-          ./scripts/verify_action_output.sh \
+          ./scripts/validation/verify_action_output.sh \
             --test-name "default" \
             --input "${{ inputs.example_input || 'test-value' }}" \
             "${{ steps.test-default.outputs.example-output }}" \
@@ -51,7 +51,7 @@ jobs:
 
       - name: Verify Custom Output
         run: |
-          ./scripts/verify_action_output.sh \
+          ./scripts/validation/verify_action_output.sh \
             --test-name "custom" \
             --input "custom-test-input" \
             "${{ steps.test-custom.outputs.example-output }}" \
@@ -88,7 +88,7 @@ jobs:
 
       - name: Verify Matrix Output
         run: |
-          ./scripts/verify_action_output.sh \
+          ./scripts/validation/verify_action_output.sh \
             --test-name "matrix" \
             --input "${{ matrix.example_input }}" \
             "${{ steps.test-matrix.outputs.example-output }}" \

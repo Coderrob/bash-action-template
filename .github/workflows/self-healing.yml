@@ -44,7 +44,7 @@ jobs:
       - name: Update VS Code GitHub Actions snippets
         run: |
           echo "Checking for VS Code snippets updates..."
-          bash scripts/update_snippets.sh
+          bash scripts/maintenance/update_snippets.sh
 
       - name: Add license headers to source files
         uses: Coderrob/add-copyright@main
@@ -57,9 +57,9 @@ jobs:
         id: check_changes
         run: |
           if [[ "${{ inputs.force_update }}" == "true" ]]; then
-            ./scripts/check_changes.sh --force
+            ./scripts/validation/check_changes.sh --force
           else
-            ./scripts/check_changes.sh
+            ./scripts/validation/check_changes.sh
           fi
 
       - name: Commit and push changes

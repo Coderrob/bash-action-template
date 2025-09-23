@@ -134,6 +134,6 @@ When adding new templates:
 
 ## Related Files
 
-- `scripts/summary.sh` - Uses `summary_template.md`
+- `scripts/maintenance/summary.sh` - Uses `summary_template.md`
 - `.github/workflows/` - Can use `workflow_template.yml` as reference
 - All scripts should follow patterns from `script_template.sh`

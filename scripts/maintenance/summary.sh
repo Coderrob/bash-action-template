@@ -214,10 +214,13 @@ generate_markdown_summary() {
         local event_list=()
         local count=0
         for ((i = ${#EVENTS[@]} - 1; i >= 0 && count < 5; i--)); do
-            local event="${EVENTS[$i]}"
-            local timestamp=$(echo "${event}" | grep -o '"timestamp":"[^"]*"' | cut -d'"' -f4)
-            local category=$(echo "${event}" | grep -o '"category":"[^"]*"' | cut -d'"' -f4)
-            local message=$(echo "${event}" | grep -o '"message":"[^"]*"' | cut -d'"' -f4)
+            local event="${EVENTS[${i}]}"
+            local timestamp
+            timestamp=$(echo "${event}" | grep -o '"timestamp":"[^"]*"' | cut -d'"' -f4)
+            local category
+            category=$(echo "${event}" | grep -o '"category":"[^"]*"' | cut -d'"' -f4)
+            local message
+            message=$(echo "${event}" | grep -o '"message":"[^"]*"' | cut -d'"' -f4)
             event_list+=("- **${timestamp}** [${category}]: ${message}")
             ((count++))
         done
@@ -230,9 +233,12 @@ generate_markdown_summary() {
     if [[ ${#WARNINGS[@]} -gt 0 ]]; then
         warnings_text=""
         for warning in "${WARNINGS[@]}"; do
-            local timestamp=$(echo "${warning}" | grep -o '"timestamp":"[^"]*"' | cut -d'"' -f4)
-            local category=$(echo "${warning}" | grep -o '"category":"[^"]*"' | cut -d'"' -f4)
-            local message=$(echo "${warning}" | grep -o '"message":"[^"]*"' | cut -d'"' -f4)
+            local timestamp
+            timestamp=$(echo "${warning}" | grep -o '"timestamp":"[^"]*"' | cut -d'"' -f4)
+            local category
+            category=$(echo "${warning}" | grep -o '"category":"[^"]*"' | cut -d'"' -f4)
+            local message
+            message=$(echo "${warning}" | grep -o '"message":"[^"]*"' | cut -d'"' -f4)
             warnings_text="${warnings_text}- **${timestamp}** [${category}]: ${message}\n"
         done
     else
@@ -240,13 +246,15 @@ generate_markdown_summary() {
     fi
 
     # Format errors
-    # Format errors
     if [[ ${#ERRORS[@]} -gt 0 ]]; then
         errors_text=""
         for error in "${ERRORS[@]}"; do
-            local timestamp=$(echo "${error}" | grep -o '"timestamp":"[^"]*"' | cut -d'"' -f4)
-            local category=$(echo "${error}" | grep -o '"category":"[^"]*"' | cut -d'"' -f4)
-            local message=$(echo "${error}" | grep -o '"message":"[^"]*"' | cut -d'"' -f4)
+            local timestamp
+            timestamp=$(echo "${error}" | grep -o '"timestamp":"[^"]*"' | cut -d'"' -f4)
+            local category
+            category=$(echo "${error}" | grep -o '"category":"[^"]*"' | cut -d'"' -f4)
+            local message
+            message=$(echo "${error}" | grep -o '"message":"[^"]*"' | cut -d'"' -f4)
             errors_text="${errors_text}- **${timestamp}** [${category}]: ${message}\n"
         done
     else
@@ -262,60 +270,60 @@ generate_markdown_summary() {
         template=$(cat "${template_file}")
 
         # Replace placeholders
-        template="${template//\{\{TITLE\}\}/$title}"
-        template="${template//\{\{STATUS\}\}/$status}"
-        template="${template//\{\{EXECUTION_TIME\}\}/$execution_time}"
-        template="${template//\{\{EVENTS_COUNT\}\}/$events_count}"
-        template="${template//\{\{WARNINGS_COUNT\}\}/$warnings_count}"
-        template="${template//\{\{ERRORS_COUNT\}\}/$errors_count}"
-        template="${template//\{\{START_TIME\}\}/$start_time}"
-        template="${template//\{\{END_TIME\}\}/$end_time}"
-        template="${template//\{\{INPUTS\}\}/$inputs_text}"
-        template="${template//\{\{OUTPUTS\}\}/$outputs_text}"
-        template="${template//\{\{EVENTS\}\}/$events_text}"
-        template="${template//\{\{WARNINGS\}\}/$warnings_text}"
-        template="${template//\{\{ERRORS\}\}/$errors_text}"
-        template="${template//\{\{JSON_SUMMARY\}\}/$json_summary}"
+        template="${template//\{\{TITLE\}\}/${title}}"
+        template="${template//\{\{STATUS\}\}/${status}}"
+        template="${template//\{\{EXECUTION_TIME\}\}/${execution_time}}"
+        template="${template//\{\{EVENTS_COUNT\}\}/${events_count}}"
+        template="${template//\{\{WARNINGS_COUNT\}\}/${warnings_count}}"
+        template="${template//\{\{ERRORS_COUNT\}\}/${errors_count}}"
+        template="${template//\{\{START_TIME\}\}/${start_time}}"
+        template="${template//\{\{END_TIME\}\}/${end_time}}"
+        template="${template//\{\{INPUTS\}\}/${inputs_text}}"
+        template="${template//\{\{OUTPUTS\}\}/${outputs_text}}"
+        template="${template//\{\{EVENTS\}\}/${events_text}}"
+        template="${template//\{\{WARNINGS\}\}/${warnings_text}}"
+        template="${template//\{\{ERRORS\}\}/${errors_text}}"
+        template="${template//\{\{JSON_SUMMARY\}\}/${json_summary}}"
         template="${template//\{\{GENERATION_TIME\}\}/$(get_timestamp)}"
 
         echo "${template}"
     else
         # Fallback to inline template
         cat <<EOF
-# $title
+# ${title}
 
 ## 📊 Overview
 
 - **Status**: ${status^}
 - **Execution Time**: ${execution_time}s
-- **Events Recorded**: $events_count
-- **Warnings**: $warnings_count
-- **Errors**: $errors_count
+- **Events Recorded**: ${events_count}
+- **Warnings**: ${warnings_count}
+- **Errors**: ${errors_count}
 
 ## 📥 Inputs
 
-$inputs_text
+${inputs_text}
 
 ## 📤 Outputs
 
-$outputs_text
+${outputs_text}
 
 ## 📝 Recent Events
 
-$events_text
+${events_text}
 
 ## ⚠️ Warnings
 
-$warnings_text
+${warnings_text}
 
 ## ❌ Errors
 
-$errors_text
+${errors_text}
 
 ## 📋 Raw Data
 
 \`\`\`json
-$json_summary
+${json_summary}
 \`\`\`
 
 ---

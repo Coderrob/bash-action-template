@@ -26,7 +26,7 @@ set -euo pipefail
 
 # Source the summary functions
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/../scripts/summary.sh"
+source "${SCRIPT_DIR}/../scripts/maintenance/summary.sh"
 
 # Initialize arrays that might not be properly initialized
 EVENTS=()
@@ -41,7 +41,7 @@ TESTS_FAILED=0
 # Test helper functions
 test_pass() {
     local test_name="$1"
-    echo "✅ PASS: $test_name"
+    echo "✅ PASS: ${test_name}"
     ((TESTS_PASSED++))
     ((TESTS_RUN++))
 }
@@ -49,7 +49,7 @@ test_pass() {
 test_fail() {
     local test_name="$1"
     local reason="$2"
-    echo "❌ FAIL: $test_name - $reason"
+    echo "❌ FAIL: ${test_name} - ${reason}"
     ((TESTS_FAILED++))
     ((TESTS_RUN++))
 }
@@ -59,10 +59,10 @@ assert_contains() {
     local needle="$2"
     local test_name="$3"
 
-    if [[ "$haystack" == *"$needle"* ]]; then
-        test_pass "$test_name"
+    if [[ "${haystack}" == *"${needle}"* ]]; then
+        test_pass "${test_name}"
     else
-        test_fail "$test_name" "Expected to contain '$needle'"
+        test_fail "${test_name}" "Expected to contain '${needle}'"
     fi
 }
 
@@ -71,10 +71,10 @@ assert_not_contains() {
     local needle="$2"
     local test_name="$3"
 
-    if [[ "$haystack" != *"$needle"* ]]; then
-        test_pass "$test_name"
+    if [[ "${haystack}" != *"${needle}"* ]]; then
+        test_pass "${test_name}"
     else
-        test_fail "$test_name" "Expected not to contain '$needle'"
+        test_fail "${test_name}" "Expected not to contain '${needle}'"
     fi
 }
 
@@ -83,10 +83,10 @@ assert_equals() {
     local expected="$2"
     local test_name="$3"
 
-    if [[ "$actual" == "$expected" ]]; then
-        test_pass "$test_name"
+    if [[ "${actual}" == "${expected}" ]]; then
+        test_pass "${test_name}"
     else
-        test_fail "$test_name" "Expected '$expected', got '$actual'"
+        test_fail "${test_name}" "Expected '${expected}', got '${actual}'"
     fi
 }
 
@@ -119,25 +119,25 @@ test_basic_template_replacement() {
     local json_summary
     json_summary=$(generate_json_summary)
 
-    if [[ "$json_summary" == *'"status":"success"'* ]]; then
+    if [[ "${json_summary}" == *'"status":"success"'* ]]; then
         test_pass "Status should be in JSON"
     else
         test_fail "Status should be in JSON" "Status not found"
     fi
 
-    if [[ "$json_summary" == *'"test_value"'* ]]; then
+    if [[ "${json_summary}" == *'"test_value"'* ]]; then
         test_pass "Input value should be in JSON"
     else
         test_fail "Input value should be in JSON" "Input not found"
     fi
 
-    if [[ "$json_summary" == *'"output_value"'* ]]; then
+    if [[ "${json_summary}" == *'"output_value"'* ]]; then
         test_pass "Output value should be in JSON"
     else
         test_fail "Output value should be in JSON" "Output not found"
     fi
 
-    if [[ "$json_summary" == *'"Test event occurred"'* ]]; then
+    if [[ "${json_summary}" == *'"Test event occurred"'* ]]; then
         test_pass "Event message should be in JSON"
     else
         test_fail "Event message should be in JSON" "Event not found"
@@ -168,19 +168,19 @@ test_empty_template_replacement() {
     local json_summary
     json_summary=$(generate_json_summary)
 
-    if [[ "$json_summary" == *'"status":"completed"'* ]]; then
+    if [[ "${json_summary}" == *'"status":"completed"'* ]]; then
         test_pass "Status should be completed"
     else
         test_fail "Status should be completed" "Status not found"
     fi
 
-    if [[ "$json_summary" == *'"inputs":null'* ]]; then
+    if [[ "${json_summary}" == *'"inputs":null'* ]]; then
         test_pass "Inputs should be null"
     else
         test_fail "Inputs should be null" "Inputs not null"
     fi
 
-    if [[ "$json_summary" == *'"events":[]'* ]]; then
+    if [[ "${json_summary}" == *'"events":[]'* ]]; then
         test_pass "Events should be empty array"
     else
         test_fail "Events should be empty array" "Events not empty"
@@ -213,19 +213,19 @@ test_warnings_errors_template() {
     local summary
     summary=$(generate_markdown_summary "Error Summary")
 
-    if [[ "$summary" == *"Invalid input detected"* ]]; then
+    if [[ "${summary}" == *"Invalid input detected"* ]]; then
         test_pass "Warning should be present"
     else
         test_fail "Warning should be present" "Warning not found"
     fi
 
-    if [[ "$summary" == *"Failed to process data"* ]]; then
+    if [[ "${summary}" == *"Failed to process data"* ]]; then
         test_pass "Error should be present"
     else
         test_fail "Error should be present" "Error not found"
     fi
 
-    if [[ "$summary" == *"failed"* ]]; then
+    if [[ "${summary}" == *"failed"* ]]; then
         test_pass "Status should be 'failed'"
     else
         test_fail "Status should be 'failed'" "Status not found"
@@ -259,25 +259,25 @@ test_json_summary_format() {
     local json_summary
     json_summary=$(generate_json_summary)
 
-    if [[ "$json_summary" == *'{"start_time":'* ]]; then
+    if [[ "${json_summary}" == *'{"start_time":'* ]]; then
         test_pass "JSON should start with start_time"
     else
         test_fail "JSON should start with start_time" "Invalid JSON format"
     fi
 
-    if [[ "$json_summary" == *'"status":"success"'* ]]; then
+    if [[ "${json_summary}" == *'"status":"success"'* ]]; then
         test_pass "Status should be in JSON"
     else
         test_fail "Status should be in JSON" "Status not found"
     fi
 
-    if [[ "$json_summary" == *'"inputs":{"key1":"value1"}'* ]]; then
+    if [[ "${json_summary}" == *'"inputs":{"key1":"value1"}'* ]]; then
         test_pass "Inputs should be in JSON"
     else
         test_fail "Inputs should be in JSON" "Inputs not found"
     fi
 
-    if [[ "$json_summary" == *'"outputs":{"out1":"result1"}'* ]]; then
+    if [[ "${json_summary}" == *'"outputs":{"out1":"result1"}'* ]]; then
         test_pass "Outputs should be in JSON"
     else
         test_fail "Outputs should be in JSON" "Outputs not found"
@@ -312,25 +312,25 @@ test_multiple_inputs_outputs() {
     local summary
     summary=$(generate_markdown_summary "Multi IO Summary")
 
-    if [[ "$summary" == *"input1: value1"* ]]; then
+    if [[ "${summary}" == *"input1: value1"* ]]; then
         test_pass "First input should be present"
     else
         test_fail "First input should be present" "Input not found"
     fi
 
-    if [[ "$summary" == *"input2: value2"* ]]; then
+    if [[ "${summary}" == *"input2: value2"* ]]; then
         test_pass "Second input should be present"
     else
         test_fail "Second input should be present" "Input not found"
     fi
 
-    if [[ "$summary" == *"output1: result1"* ]]; then
+    if [[ "${summary}" == *"output1: result1"* ]]; then
         test_pass "First output should be present"
     else
         test_fail "First output should be present" "Output not found"
     fi
 
-    if [[ "$summary" == *"output2: result2"* ]]; then
+    if [[ "${summary}" == *"output2: result2"* ]]; then
         test_pass "Second output should be present"
     else
         test_fail "Second output should be present" "Output not found"
@@ -349,13 +349,13 @@ test_special_characters() {
     local json_summary
     json_summary=$(generate_json_summary)
 
-    if [[ "$json_summary" == *'value with '* && "$json_summary" == *'quotes'* && "$json_summary" == *'<tags>'* ]]; then
+    if [[ "${json_summary}" == *'value with '* && "${json_summary}" == *'quotes'* && "${json_summary}" == *'<tags>'* ]]; then
         test_pass "Special characters should be preserved in inputs"
     else
         test_fail "Special characters should be preserved in inputs" "Special chars not found in input"
     fi
 
-    if [[ "$json_summary" == *'Message with '* && "$json_summary" == *'quotes'* && "$json_summary" == *'backslashes'* ]]; then
+    if [[ "${json_summary}" == *'Message with '* && "${json_summary}" == *'quotes'* && "${json_summary}" == *'backslashes'* ]]; then
         test_pass "Event message should be present"
     else
         test_fail "Event message should be present" "Event message not found"
@@ -382,11 +382,11 @@ run_tests() {
 
     echo
     echo "📊 Test Results:"
-    echo "   Total: $TESTS_RUN"
-    echo "   Passed: $TESTS_PASSED"
-    echo "   Failed: $TESTS_FAILED"
+    echo "   Total: ${TESTS_RUN}"
+    echo "   Passed: ${TESTS_PASSED}"
+    echo "   Failed: ${TESTS_FAILED}"
 
-    if [[ $TESTS_FAILED -eq 0 ]]; then
+    if [[ ${TESTS_FAILED} -eq 0 ]]; then
         echo "🎉 All tests passed!"
         return 0
     else

@@ -89,7 +89,7 @@ done
 
 # Check 5: Repository structure
 echo "Checking repository structure..."
-required_files=("action.yml" "scripts/main.sh" "scripts/utils.sh")
+required_files=("action.yml" "scripts/services/main.sh" "scripts/lib/utils.sh")
 for file in "${required_files[@]}"; do
     if [[ -f "$file" ]]; then
         report_success "$file exists"
@@ -100,12 +100,12 @@ done
 
 # Check 6: Test action functionality
 echo "Testing action functionality..."
-if [[ -x "scripts/main.sh" ]]; then
+if [[ -x "scripts/services/main.sh" ]]; then
     export INPUT_EXAMPLE_INPUT="health-check-test"
     export INPUT_LOG_LEVEL="info"
     export GITHUB_OUTPUT="/tmp/health-check-output"
 
-    if ./scripts/main.sh >/dev/null 2>&1; then
+    if ./scripts/services/main.sh >/dev/null 2>&1; then
         if [[ -f "/tmp/health-check-output" ]]; then
             report_success "Action executes successfully"
         else
@@ -241,52 +241,6 @@ fi
 echo "Self-healing maintenance completed"
 ```
 
-### GitHub Actions Integration
-
-```yaml
-# .github/workflows/self-healing.yml
-name: Self-Healing Maintenance
-
-on:
-  schedule:
-    # Run daily at 2 AM UTC
-    - cron: "0 2 * * *"
-  workflow_dispatch:
-
-jobs:
-  self-heal:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Run Self-Healing
-        run: |
-          chmod +x scripts/*.sh
-          ./scripts/self-healing.sh
-
-      - name: Create Pull Request
-        if: success()
-        uses: peter-evans/create-pull-request@v5
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "chore: self-healing maintenance"
-          title: "Self-Healing Maintenance"
-          body: |
-            Automated maintenance performed by self-healing workflow.
-
-            Changes include:
-            - Fixed script permissions
-            - Updated dependencies
-            - Code formatting
-            - Health check validation
-          branch: self-healing/run-${{ github.run_id }}
-          delete-branch: true
-```
-
 ## Monitoring & Alerts
 
 ### Health Status Dashboard
@@ -347,7 +301,7 @@ send_alert() {
 # Check for critical issues
 check_critical_issues() {
     # Check if main script is broken
-    if ! bash -n scripts/main.sh 2>/dev/null; then
+    if ! bash -n scripts/services/main.sh 2>/dev/null; then
         send_alert "Main script has syntax errors" "critical"
     fi
 

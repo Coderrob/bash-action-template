@@ -32,8 +32,8 @@ echo "Running basic validation tests..."
 echo "Testing file existence..."
 required_files=(
     "action.yml"
-    "scripts/main.sh"
-    "scripts/utils.sh"
+    "scripts/services/main.sh"
+    "scripts/lib/utils.sh"
     ".shellcheckrc"
     ".editorconfig"
     ".github/workflows/ci.yml"
@@ -65,8 +65,8 @@ echo ""
 echo "Testing utility functions..."
 cd "${SCRIPT_DIR}/.."
 
-# shellcheck source=../scripts/utils.sh
-source scripts/utils.sh
+# shellcheck source=../scripts/lib/utils.sh
+source scripts/lib/utils.sh
 
 # Test logging initialization
 if init_logging "info" >/dev/null 2>&1; then
@@ -100,7 +100,7 @@ temp_output_file="/tmp/github_output_test"
 export GITHUB_OUTPUT="${temp_output_file}"
 
 # Run the main script
-if timeout 30 ./scripts/main.sh >/dev/null 2>&1; then
+if timeout 30 ./scripts/services/main.sh >/dev/null 2>&1; then
     echo "✓ Main script executes successfully"
 
     # Check if output was generated

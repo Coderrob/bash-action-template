@@ -56,7 +56,7 @@ parse_common_help_args() {
 
     case "${1:-}" in
     -h | --help)
-        "$show_usage_func"
+        "${show_usage_func}"
         exit "${EXIT_SUCCESS}"
         ;;
     --version)
@@ -94,7 +94,7 @@ handle_unknown_option() {
     local option="$1"
     local component="${2:-args}"
 
-    log_error "$component" "Unknown option: $option"
+    log_error "${component}" "Unknown option: ${option}"
     if [[ $(type -t show_usage) == function ]]; then
         show_usage >&2
     fi
@@ -120,13 +120,13 @@ init_logging() {
     info) LOG_LEVEL="${LOG_LEVEL_INFO}" ;;
     warn | warning) LOG_LEVEL="${LOG_LEVEL_WARN}" ;;
     error) LOG_LEVEL="${LOG_LEVEL_ERROR}" ;;
-    *) log_warn "logging" "Unknown log level '$level', using 'info'" ;;
+    *) log_warn "logging" "Unknown log level '${level}', using 'info'" ;;
     esac
 
     # Set component for logging
     LOG_COMPONENT="${component}"
 
-    log_debug "logging" "Initialized logging for component: $component, level: $level"
+    log_debug "logging" "Initialized logging for component: ${component}, level: ${level}"
 }
 
 # Get current timestamp in ISO format
@@ -229,11 +229,11 @@ create_json_object() {
     local first=true
 
     for pair in "$@"; do
-        if [[ $pair == *"="* ]]; then
+        if [[ ${pair} == *"="* ]]; then
             local key="${pair%%=*}"
             local value="${pair#*=}"
 
-            if [[ "$first" == "true" ]]; then
+            if [[ "${first}" == "true" ]]; then
                 first=false
             else
                 json="${json},"
@@ -256,8 +256,8 @@ create_json_object() {
 validate_command_exists() {
     local cmd="$1"
 
-    if ! command -v "$cmd" >/dev/null 2>&1; then
-        log_error "validation" "Required command not found: $cmd"
+    if ! command -v "${cmd}" >/dev/null 2>&1; then
+        log_error "validation" "Required command not found: ${cmd}"
         return 1
     fi
 
@@ -390,7 +390,7 @@ string_length() {
 # Usage: sanitize_input "user input"
 sanitize_input() {
     local input="$1"
-    local sanitized="$input"
+    local sanitized="${input}"
 
     # Remove or escape dangerous characters
     sanitized="${sanitized//;/}"  # Remove semicolons
@@ -402,7 +402,7 @@ sanitize_input() {
     sanitized="${sanitized//</}"  # Remove less than
     sanitized="${sanitized//>/}"  # Remove greater than
 
-    echo "$sanitized"
+    echo "${sanitized}"
 }
 
 # Create a metric for monitoring/tracking

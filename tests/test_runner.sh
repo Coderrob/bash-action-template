@@ -70,7 +70,8 @@ source "$(dirname "${BASH_SOURCE[0]}")/../scripts/lib/script_init.sh"
 source "$(dirname "${BASH_SOURCE[0]}")/../scripts/lib/utils.sh"
 
 # Define test script directory for test output
-readonly TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+test_script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly TEST_SCRIPT_DIR="${test_script_dir}"
 export TEST_SCRIPT_DIR
 readonly TEST_OUTPUT_DIR="/tmp/bash_action_test_$$"
 export TEST_OUTPUT_DIR
@@ -96,44 +97,44 @@ create_assertion() {
     local actual="$3"
     local assertion_type="${4:-equals}"
 
-    case "$assertion_type" in
+    case "${assertion_type}" in
     equals)
-        if [[ "$expected" == "$actual" ]]; then
-            echo "$TEST_RESULT_PASS"
+        if [[ "${expected}" == "${actual}" ]]; then
+            echo "${TEST_RESULT_PASS}"
         else
-            echo "$TEST_RESULT_FAIL"
+            echo "${TEST_RESULT_FAIL}"
         fi
         ;;
     not_equals)
-        if [[ "$expected" != "$actual" ]]; then
-            echo "$TEST_RESULT_PASS"
+        if [[ "${expected}" != "${actual}" ]]; then
+            echo "${TEST_RESULT_PASS}"
         else
-            echo "$TEST_RESULT_FAIL"
+            echo "${TEST_RESULT_FAIL}"
         fi
         ;;
     contains)
-        if string_contains "$actual" "$expected"; then
-            echo "$TEST_RESULT_PASS"
+        if string_contains "${actual}" "${expected}"; then
+            echo "${TEST_RESULT_PASS}"
         else
-            echo "$TEST_RESULT_FAIL"
+            echo "${TEST_RESULT_FAIL}"
         fi
         ;;
     not_empty)
-        if [[ -n "$actual" ]]; then
-            echo "$TEST_RESULT_PASS"
+        if [[ -n "${actual}" ]]; then
+            echo "${TEST_RESULT_PASS}"
         else
-            echo "$TEST_RESULT_FAIL"
+            echo "${TEST_RESULT_FAIL}"
         fi
         ;;
     file_exists)
-        if [[ -f "$actual" ]]; then
-            echo "$TEST_RESULT_PASS"
+        if [[ -f "${actual}" ]]; then
+            echo "${TEST_RESULT_PASS}"
         else
-            echo "$TEST_RESULT_FAIL"
+            echo "${TEST_RESULT_FAIL}"
         fi
         ;;
     *)
-        echo "$TEST_RESULT_FAIL"
+        echo "${TEST_RESULT_FAIL}"
         ;;
     esac
 }
@@ -146,32 +147,30 @@ format_test_result() {
 
     local color_code status_symbol
 
-    case "$result" in
-    "$TEST_RESULT_PASS")
+    case "${result}" in
+    "${TEST_RESULT_PASS}")
         color_code='\033[0;32m' # Green
         status_symbol="✓"
         ;;
-    "$TEST_RESULT_FAIL")
+    "${TEST_RESULT_FAIL}")
         color_code='\033[0;31m' # Red
         status_symbol="✗"
         ;;
-    "$TEST_RESULT_SKIP")
-        color_code='\033[1;33m' # Yellow
-        status_symbol="○"
+    "${TEST_RESULT_SKIP}")
+        color_code='\033[0;33m' # Yellow
+        status_symbol="⚠"
         ;;
     *)
-        color_code='\033[0m' # No color
+        color_code='\033[0;31m' # Red
         status_symbol="?"
         ;;
     esac
 
-    local formatted_output="${color_code}${status_symbol} ${result}${COLOR_NC} ${test_name}"
-
-    if [[ -n "$message" ]]; then
-        formatted_output="${formatted_output}: ${message}"
+    if [[ -n "${message}" ]]; then
+        echo -e "${color_code}${status_symbol} ${test_name}: ${message}\033[0m"
+    else
+        echo -e "${color_code}${status_symbol} ${test_name}\033[0m"
     fi
-
-    echo -e "$formatted_output"
 }
 
 # Function: Run a test with comprehensive monitoring
@@ -186,17 +185,17 @@ run_test() {
     test_start_time="$(date +%s)"
 
     # Check if test should be skipped
-    if [[ -n "$skip_reason" ]]; then
-        SKIPPED_TESTS+=("$test_name")
-        format_test_result "$TEST_RESULT_SKIP" "$test_name" "$skip_reason"
+    if [[ -n "${skip_reason}" ]]; then
+        SKIPPED_TESTS+=("${test_name}")
+        format_test_result "${TEST_RESULT_SKIP}" "${test_name}" "${skip_reason}"
         create_metric "test_execution" "1" "count" "result=skip,test=${test_name}"
         return 0
     fi
 
     # Verify test function exists
-    if ! declare -f "$test_function" >/dev/null 2>&1; then
-        FAILED_TESTS+=("$test_name")
-        format_test_result "$TEST_RESULT_FAIL" "$test_name" "Test function '$test_function' not found"
+    if ! declare -f "${test_function}" >/dev/null 2>&1; then
+        FAILED_TESTS+=("${test_name}")
+        format_test_result "${TEST_RESULT_FAIL}" "${test_name}" "Test function '${test_function}' not found"
         create_metric "test_execution" "1" "count" "result=fail,test=${test_name},reason=function_not_found"
         return 1
     fi
@@ -207,45 +206,45 @@ run_test() {
     local exit_file="/tmp/exit_code_$$"
     (
         set +e
-        eval "$test_function > \"$temp_output\" 2>&1"
-        echo $? >"$exit_file"
+        eval "${test_function} > \"${temp_output}\" 2>&1"
+        echo $? >"${exit_file}"
     ) 2>/dev/null
-    exit_code="$(cat "$exit_file")"
-    test_output="$(cat "$temp_output")"
-    rm -f "$temp_output" "$exit_file"
+    exit_code="$(cat "${exit_file}")"
+    test_output="$(cat "${temp_output}")"
+    rm -f "${temp_output}" "${exit_file}"
 
     test_end_time="$(date +%s)"
     test_duration="$((test_end_time - test_start_time))"
 
     # Determine test result
-    if [[ $exit_code -eq 0 ]]; then
-        test_result="$TEST_RESULT_PASS"
-        PASSED_TESTS+=("$test_name")
+    if [[ ${exit_code} -eq 0 ]]; then
+        test_result="${TEST_RESULT_PASS}"
+        PASSED_TESTS+=("${test_name}")
     else
-        test_result="$TEST_RESULT_FAIL"
-        FAILED_TESTS+=("$test_name")
+        test_result="${TEST_RESULT_FAIL}"
+        FAILED_TESTS+=("${test_name}")
     fi
 
     # Create test metrics
-    create_metric "test_execution_time" "$test_duration" "seconds" "test=${test_name}"
+    create_metric "test_execution_time" "${test_duration}" "seconds" "test=${test_name}"
     create_metric "test_execution" "1" "count" "result=${test_result,,},test=${test_name}"
 
     # Format and display result
     local result_message=""
-    if [[ $exit_code -ne 0 && -n "$test_output" ]]; then
-        result_message="Exit code: $exit_code"
+    if [[ ${exit_code} -ne 0 && -n "${test_output}" ]]; then
+        result_message="Exit code: ${exit_code}"
     fi
 
-    format_test_result "$test_result" "$test_name" "$result_message"
+    format_test_result "${test_result}" "${test_name}" "${result_message}"
 
-    echo "Test $test_name: $test_result" >&2
+    echo "Test ${test_name}: ${test_result}" >&2
 
     # Log detailed output in debug mode
-    if [[ -n "$test_output" ]]; then
-        log_debug "test" "Test output for $test_name" "output=$test_output"
+    if [[ -n "${test_output}" ]]; then
+        log_debug "test" "Test output for ${test_name}" "output=${test_output}"
     fi
 
-    return $exit_code
+    return "${exit_code}"
 }
 
 # Legacy assertion functions for backward compatibility
@@ -255,13 +254,13 @@ assert_equals() {
     local test_name="${3:-assertion}"
 
     local result
-    result="$(create_assertion "$test_name" "$expected" "$actual" "equals")"
+    result="$(create_assertion "${test_name}" "${expected}" "${actual}" "equals")"
 
-    if [[ "$result" == "$TEST_RESULT_PASS" ]]; then
-        format_test_result "$TEST_RESULT_PASS" "$test_name"
+    if [[ "${result}" == "${TEST_RESULT_PASS}" ]]; then
+        format_test_result "${TEST_RESULT_PASS}" "${test_name}"
         return 0
     else
-        format_test_result "$TEST_RESULT_FAIL" "$test_name" "Expected '$expected', got '$actual'"
+        format_test_result "${TEST_RESULT_FAIL}" "${test_name}" "Expected '${expected}', got '${actual}'"
         return 1
     fi
 }
@@ -271,13 +270,13 @@ assert_not_empty() {
     local test_name="${2:-not_empty_assertion}"
 
     local result
-    result="$(create_assertion "$test_name" "" "$value" "not_empty")"
+    result="$(create_assertion "${test_name}" "" "${value}" "not_empty")"
 
-    if [[ "$result" == "$TEST_RESULT_PASS" ]]; then
-        format_test_result "$TEST_RESULT_PASS" "$test_name"
+    if [[ "${result}" == "${TEST_RESULT_PASS}" ]]; then
+        format_test_result "${TEST_RESULT_PASS}" "${test_name}"
         return 0
     else
-        format_test_result "$TEST_RESULT_FAIL" "$test_name" "Value is empty"
+        format_test_result "${TEST_RESULT_FAIL}" "${test_name}" "Value is empty"
         return 1
     fi
 }
@@ -287,13 +286,13 @@ assert_file_exists() {
     local test_name="${2:-file_exists_assertion}"
 
     local result
-    result="$(create_assertion "$test_name" "" "$file_path" "file_exists")"
+    result="$(create_assertion "${test_name}" "" "${file_path}" "file_exists")"
 
-    if [[ "$result" == "$TEST_RESULT_PASS" ]]; then
-        format_test_result "$TEST_RESULT_PASS" "$test_name"
+    if [[ "${result}" == "${TEST_RESULT_PASS}" ]]; then
+        format_test_result "${TEST_RESULT_PASS}" "${test_name}"
         return 0
     else
-        format_test_result "$TEST_RESULT_FAIL" "$test_name" "File does not exist: $file_path"
+        format_test_result "${TEST_RESULT_FAIL}" "${test_name}" "File does not exist: ${file_path}"
         return 1
     fi
 }
@@ -304,24 +303,24 @@ test_string_functions() {
 
     # Test trim function
     local trimmed
-    trimmed="$(trim_string "$test_input")"
+    trimmed="$(trim_string "${test_input}")"
     local trim_result
-    trim_result="$(create_assertion "trim_string" "Hello World" "$trimmed")"
-    [[ "$trim_result" == "$TEST_RESULT_PASS" ]] || return 1
+    trim_result="$(create_assertion "trim_string" "Hello World" "${trimmed}")"
+    [[ "${trim_result}" == "${TEST_RESULT_PASS}" ]] || return 1
 
     # Test uppercase conversion
     local uppercase
-    uppercase="$(to_uppercase "$trimmed")"
+    uppercase="$(to_uppercase "${trimmed}")"
     local upper_result
-    upper_result="$(create_assertion "to_uppercase" "HELLO WORLD" "$uppercase")"
-    [[ "$upper_result" == "$TEST_RESULT_PASS" ]] || return 1
+    upper_result="$(create_assertion "to_uppercase" "HELLO WORLD" "${uppercase}")"
+    [[ "${upper_result}" == "${TEST_RESULT_PASS}" ]] || return 1
 
     # Test lowercase conversion
     local lowercase
-    lowercase="$(to_lowercase "$uppercase")"
+    lowercase="$(to_lowercase "${uppercase}")"
     local lower_result
-    lower_result="$(create_assertion "to_lowercase" "hello world" "$lowercase")"
-    [[ "$lower_result" == "$TEST_RESULT_PASS" ]] || return 1
+    lower_result="$(create_assertion "to_lowercase" "hello world" "${lowercase}")"
+    [[ "${lower_result}" == "${TEST_RESULT_PASS}" ]] || return 1
 
     return 0
 }
@@ -345,7 +344,7 @@ test_file_existence() {
         if [[ -f "${TEST_SCRIPT_DIR}/../${file}" ]]; then
             continue
         else
-            log_error "test" "Required file missing: $file"
+            log_error "test" "Required file missing: ${file}"
             return 1
         fi
     done
@@ -362,7 +361,7 @@ test_script_permissions() {
         if [[ -x "${script}" ]]; then
             continue
         else
-            log_error "test" "Script not executable: ${script#${script_dir}/}"
+            log_error "test" "Script not executable: ${script#"${script_dir}"/}"
             return 1
         fi
     done < <(find "${script_dir}" -name "*.sh" -type f -print0)
@@ -414,7 +413,7 @@ setup_test_environment() {
     log_info "test_setup" "Setting up test environment" "version=${TEST_FRAMEWORK_VERSION}"
 
     # Create output directory
-    mkdir -p "$TEST_OUTPUT_DIR"
+    mkdir -p "${TEST_OUTPUT_DIR}"
 
     # Initialize test state
     FAILED_TESTS=()
@@ -444,7 +443,7 @@ generate_test_report() {
     echo ""
 
     # Show failed tests details
-    if [[ $failed_count -gt 0 ]]; then
+    if [[ ${failed_count} -gt 0 ]]; then
         echo "Failed Tests:"
         for test in "${FAILED_TESTS[@]}"; do
             echo "  ✗ $test"
@@ -453,25 +452,25 @@ generate_test_report() {
     fi
 
     # Create final metrics
-    create_metric "test_suite_total" "$TESTS_RUN" "count"
-    create_metric "test_suite_passed" "$passed_count" "count"
-    create_metric "test_suite_failed" "$failed_count" "count"
-    create_metric "test_suite_skipped" "$skipped_count" "count"
+    create_metric "test_suite_total" "${TESTS_RUN}" "count"
+    create_metric "test_suite_passed" "${passed_count}" "count"
+    create_metric "test_suite_failed" "${failed_count}" "count"
+    create_metric "test_suite_skipped" "${skipped_count}" "count"
 
     # Calculate success rate
     local success_rate=0
-    if [[ $TESTS_RUN -gt 0 ]]; then
+    if [[ ${TESTS_RUN} -gt 0 ]]; then
         success_rate=$(((passed_count * 100) / TESTS_RUN))
     fi
 
-    create_metric "test_suite_success_rate" "$success_rate" "percent"
+    create_metric "test_suite_success_rate" "${success_rate}" "percent"
 
     echo "Success Rate: ${success_rate}%"
     echo "=========================================="
     # log_info "test_summary" "Test suite completed" "total=${TESTS_RUN},passed=${#PASSED_TESTS[@]},failed=${#FAILED_TESTS[@]},skipped=${#SKIPPED_TESTS[@]}"
 
     # Return appropriate exit code
-    if [[ $failed_count -eq 0 ]]; then
+    if [[ ${failed_count} -eq 0 ]]; then
         log_success "test_summary" "All tests passed" "passed=${passed_count}"
         return 0
     else
@@ -485,7 +484,7 @@ cleanup() {
     log_info "test_cleanup" "Cleaning up test environment"
 
     # Remove temporary test files
-    find "$TEST_OUTPUT_DIR" -name "*_test" -type f -delete 2>/dev/null || true
+    find "${TEST_OUTPUT_DIR}" -name "*_test" -type f -delete 2>/dev/null || true
 
     log_debug "test_cleanup" "Test cleanup completed"
 }
@@ -517,7 +516,7 @@ main() {
 
     log_group_end
 
-    exit $test_exit_code
+    exit ${test_exit_code}
 }
 
 # Export test functions for use in subshells

@@ -68,13 +68,13 @@ author: "Your Name"
 
 #### 2. Customize Scripts
 
-**`scripts/main.sh`**:
+**`scripts/services/main.sh`**:
 
 - Modify the main logic to implement your action's functionality
 - Update input/output handling
 - Add your custom validation and processing
 
-**`scripts/utils.sh`**:
+**`scripts/lib/utils.sh`**:
 
 - Add utility functions specific to your use case
 - Extend existing functions as needed
@@ -111,7 +111,7 @@ The template system allows you to create custom output formats:
    {{CUSTOM_DATA}}
    ```
 
-2. **Update summary generation** in `scripts/summary.sh`:
+2. **Update summary generation** in `scripts/maintenance/summary.sh`:
 
    ```bash
    # Add custom template logic
@@ -135,7 +135,7 @@ inputs:
     required: true
 ```
 
-**`scripts/main.sh`** - Handle the new inputs:
+**`scripts/services/main.sh`** - Handle the new inputs:
 
 ```bash
 # Read custom inputs

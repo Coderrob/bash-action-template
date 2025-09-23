@@ -31,10 +31,10 @@ cat action.yml
 python3 -c "import yaml; yaml.safe_load(open('action.yml'))" && echo "✅ action.yml is valid YAML"
 
 # Check main script syntax
-bash -n scripts/main.sh && echo "✅ main.sh syntax is valid"
+bash -n scripts/services/main.sh && echo "✅ main.sh syntax is valid"
 
 # Check utils script syntax
-bash -n scripts/utils.sh && echo "✅ utils.sh syntax is valid"
+bash -n scripts/lib/utils.sh && echo "✅ utils.sh syntax is valid"
 ```
 
 ## Common Quick Fixes
@@ -84,7 +84,7 @@ export INPUT_LOG_LEVEL="debug"
 export GITHUB_OUTPUT="/tmp/action-output-test"
 
 # Run the action
-./scripts/main.sh
+./scripts/services/main.sh
 
 # Check output
 echo "Action output:"
@@ -157,7 +157,7 @@ time (
     export INPUT_EXAMPLE_INPUT="performance-test"
     export INPUT_LOG_LEVEL="info"
     export GITHUB_OUTPUT="/tmp/perf-output"
-    ./scripts/main.sh >/dev/null 2>&1
+    ./scripts/services/main.sh >/dev/null 2>&1
 )
 echo "✅ Performance test complete"
 ```
