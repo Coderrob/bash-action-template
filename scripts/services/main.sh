@@ -287,9 +287,9 @@ process_example_input() {
 #   validate_all_inputs "${INPUT_EXAMPLE_INPUT:-}" "${PWD}" "debug"
 #
 # Dependencies:
-#   - validate_directory_accessible (functional_utils.sh)
-#   - to_lowercase (functional_utils.sh)
-#   - log_warn, log_error (init.sh)
+#   - validate_directory_exists (utils.sh)
+#   - to_lowercase (utils.sh)
+#   - log_warn, log_error (core.sh)
 #==============================================================================
 validate_all_inputs() {
     local example_input="$1"
@@ -299,7 +299,7 @@ validate_all_inputs() {
     local validation_errors=()
 
     # Validate working directory exists and is accessible
-    if ! validate_directory_accessible "${working_directory}"; then
+    if ! validate_directory_exists "${working_directory}"; then
         validation_errors+=("working_directory: Directory not accessible: ${working_directory}")
     fi
 

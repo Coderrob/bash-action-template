@@ -301,7 +301,7 @@ validate_directory_exists() {
     local dir_path="$1"
     local error_msg="${2:-Directory ${dir_path} does not exist or is not accessible}"
 
-    if [[ ! -d "${dir_path}" ]]; then
+    if [[ ! -d "${dir_path}" || ! -r "${dir_path}" ]]; then
         log_error "validation" "${error_msg}"
         return "${EXIT_INVALID_ARGS}"
     fi
@@ -364,11 +364,6 @@ validate_inputs() {
     local log_level="$3"
 
     local validation_errors=()
-
-    # Validate working directory exists and is accessible
-    if ! validate_directory_exists "${working_directory}"; then
-        validation_errors+=("working_directory: Directory not accessible: ${working_directory}")
-    fi
 
     # Validate log level is supported
     case "$(to_lowercase "${log_level}")" in
