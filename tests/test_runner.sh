@@ -489,6 +489,7 @@ generate_test_report() {
 }
 
 # Function: Custom cleanup for test runner
+# shellcheck disable=SC2317
 cleanup() {
     log_info "test_cleanup" "Cleaning up test environment"
 
