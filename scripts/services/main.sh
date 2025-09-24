@@ -66,6 +66,10 @@ source "$(dirname "${BASH_SOURCE[0]}")/../lib/common_args.sh"
 # shellcheck source=../lib/script_init.sh
 source "$(dirname "${BASH_SOURCE[0]}")/../lib/script_init.sh"
 
+# Source utility functions
+# shellcheck source=../lib/utils.sh
+source "$(dirname "${BASH_SOURCE[0]}")/../lib/utils.sh"
+
 # Readonly global constants (immutable by design)
 readonly ACTION_NAME="bash-action-template"
 readonly ACTION_VERSION="2.0.0"
@@ -74,29 +78,6 @@ readonly MIN_BASH_VERSION="4.4"
 # Immutable script metadata
 # shellcheck disable=SC2155
 readonly SCRIPT_START_TIME="$(date +%s)"
-
-#==============================================================================
-# Script Initialization
-#==============================================================================
-
-# Initialize logging with default level
-init_logging "main" "${INPUT_LOG_LEVEL:-info}"
-
-# Set up error handling
-set -euo pipefail
-trap 'handle_error "Unexpected error occurred" "$?"' ERR
-trap 'handle_exit' EXIT
-trap 'handle_interrupt' INT TERM
-
-log_debug "init" "Initializing script: ${ACTION_NAME}" "version=${ACTION_VERSION}"
-
-# Check rate limits if in GitHub Actions
-if is_github_actions && ! check_github_rate_limit 50; then
-    log_error "init" "Rate limit check failed, aborting execution"
-    exit "${EXIT_FAILURE}"
-fi
-
-log_info "init" "Script initialization completed" "script=${ACTION_NAME},version=${ACTION_VERSION}"
 
 #==============================================================================
 # Error Handling Functions
@@ -132,6 +113,29 @@ handle_interrupt() {
     log_warn "interrupt" "Script interrupted by user"
     exit "${EXIT_FAILURE}"
 }
+
+#==============================================================================
+# Script Initialization
+#==============================================================================
+
+# Initialize logging with default level
+init_logging "main" "${INPUT_LOG_LEVEL:-info}"
+
+# Set up error handling
+set -euo pipefail
+trap 'handle_error "Unexpected error occurred" "$?"' ERR
+trap 'handle_exit' EXIT
+trap 'handle_interrupt' INT TERM
+
+log_debug "init" "Initializing script: ${ACTION_NAME}" "version=${ACTION_VERSION}"
+
+# Check rate limits if in GitHub Actions
+if is_github_actions && ! check_github_rate_limit 50; then
+    log_error "init" "Rate limit check failed, aborting execution"
+    exit "${EXIT_FAILURE}"
+fi
+
+log_info "init" "Script initialization completed" "script=${ACTION_NAME},version=${ACTION_VERSION}"
 
 #==============================================================================
 # Function: validate_bash_version
