@@ -55,12 +55,16 @@
 #==============================================================================
 
 # Source the core library (provides logging, constants, and shared functionality)
-# shellcheck source=./lib/core.sh
-source "$(dirname "${BASH_SOURCE[0]}")/lib/core.sh"
+# shellcheck source=../lib/core.sh
+source "$(dirname "${BASH_SOURCE[0]}")/../lib/core.sh"
 
 # Source common argument parsing utilities
-# shellcheck source=./lib/common_args.sh
-source "$(dirname "${BASH_SOURCE[0]}")/lib/common_args.sh"
+# shellcheck source=../lib/common_args.sh
+source "$(dirname "${BASH_SOURCE[0]}")/../lib/common_args.sh"
+
+# Source script initialization utilities
+# shellcheck source=../lib/script_init.sh
+source "$(dirname "${BASH_SOURCE[0]}")/../lib/script_init.sh"
 
 # Readonly global constants (immutable by design)
 readonly ACTION_NAME="bash-action-template"
@@ -68,8 +72,8 @@ readonly ACTION_VERSION="2.0.0"
 readonly MIN_BASH_VERSION="4.4"
 
 # Immutable script metadata
-readonly SCRIPT_START_TIME
-SCRIPT_START_TIME="$(date +%s)"
+# shellcheck disable=SC2155
+readonly SCRIPT_START_TIME="$(date +%s)"
 
 #==============================================================================
 # Script Initialization
