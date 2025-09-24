@@ -156,9 +156,9 @@ log_structured() {
     # GitHub Actions integration
     if [[ -n "${GITHUB_ACTIONS:-}" ]]; then
         case "${level,,}" in
-        debug) echo "::debug::${message}" ;;
-        warn | warning) echo "::warning::${message}" ;;
-        error) echo "::error::${message}" ;;
+        debug) echo "::debug::${message}" >&2 ;;
+        warn | warning) echo "::warning::${message}" >&2 ;;
+        error) echo "::error::${message}" >&2 ;;
         esac
     fi
 }
