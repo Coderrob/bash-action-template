@@ -1,0 +1,95 @@
+name: Test Action
+
+on:
+  workflow_dispatch:
+    inputs:
+      example_input:
+        description: "Example input value"
+        required: false
+        default: "test-value"
+        type: string
+      log_level:
+        description: "Log level"
+        required: false
+        default: "info"
+        type: choice
+        options:
+          - debug
+          - info
+          - warn
+          - error
+
+jobs:
+  test-action:
+    runs-on: ubuntu-latest
+    name: Test Action
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Test Action with Default Inputs
+        id: test-default
+        uses: ./
+        with:
+          example_input: ${{ inputs.example_input || 'test-value' }}
+          log_level: ${{ inputs.log_level || 'info' }}
+
+      - name: Verify Default Output
+        run: |
+          ./scripts/validation/verify_action_output.sh \
+            --test-name "default" \
+            --input "${{ inputs.example_input || 'test-value' }}" \
+            "${{ steps.test-default.outputs.example-output }}" \
+            "TEST-VALUE"
+
+      - name: Test Action with Custom Inputs
+        id: test-custom
+        uses: ./
+        with:
+          example_input: "custom-test-input"
+          log_level: "debug"
+
+      - name: Verify Custom Output
+        run: |
+          ./scripts/validation/verify_action_output.sh \
+            --test-name "custom" \
+            --input "custom-test-input" \
+            "${{ steps.test-custom.outputs.example-output }}" \
+            "CUSTOM-TEST-INPUT"
+
+  test-matrix:
+    runs-on: ubuntu-latest
+    name: Test Action Matrix
+    strategy:
+      matrix:
+        include:
+          - example_input: "hello-world"
+            log_level: "debug"
+            expected: "HELLO-WORLD"
+          - example_input: "test_case"
+            log_level: "info"
+            expected: "TEST_CASE"
+          - example_input: "mixed-CASE-input"
+            log_level: "warn"
+            expected: "MIXED-CASE-INPUT"
+          - example_input: ""
+            log_level: "error"
+            expected: ""
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Test Action Matrix
+        id: test-matrix
+        uses: ./
+        with:
+          example_input: ${{ matrix.example_input }}
+          log_level: ${{ matrix.log_level }}
+
+      - name: Verify Matrix Output
+        run: |
+          ./scripts/validation/verify_action_output.sh \
+            --test-name "matrix" \
+            --input "${{ matrix.example_input }}" \
+            "${{ steps.test-matrix.outputs.example-output }}" \
+            "${{ matrix.expected }}"

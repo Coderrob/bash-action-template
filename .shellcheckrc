@@ -1,0 +1,17 @@
+# ShellCheck configuration file
+# See: https://github.com/koalaman/shellcheck/blob/master/shellcheck.1.md
+
+# Disable specific warnings globally
+disable=SC2034  # Unused variables (often used for documentation)
+
+# Enable optional checks
+enable=require-variable-braces  # Require ${} for all variable expansions
+
+# External sources that shellcheck should check
+external-sources=true
+
+# Specify the shell dialect
+shell=bash
+
+# Check sourced files
+check-sourced=true

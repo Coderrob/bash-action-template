@@ -1,0 +1,28 @@
+name: { { WORKFLOW_NAME } }
+
+on: { { TRIGGER_EVENTS } }
+
+jobs:
+  { { JOB_NAME } }:
+    name: { { JOB_DISPLAY_NAME } }
+    runs-on: { { RUNNER_OS } }
+
+    permissions:
+      contents: read
+      # {{ADDITIONAL_PERMISSIONS}}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: { { STEP_NAME } }
+        run: |
+          {{SCRIPT_COMMANDS}}
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: { { ARTIFACT_NAME } }
+          path: { { ARTIFACT_PATH } }
+          retention-days: 30

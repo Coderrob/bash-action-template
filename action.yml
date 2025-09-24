@@ -1,0 +1,69 @@
+name: "Bash Action Template"
+description: "A template for creating GitHub Actions using bash scripts"
+author: "Your Name <your.email@example.com>"
+
+inputs:
+  example-input:
+    description: "An example input parameter"
+    required: false
+    default: "default-value"
+
+  working-directory:
+    description: "Working directory for the action"
+    required: false
+    default: "."
+
+  log-level:
+    description: "Log level (debug, info, warn, error)"
+    required: false
+    default: "info"
+
+  include-summary:
+    description: "Whether to generate and output a summary report"
+    required: false
+    default: "false"
+
+  check-rate-limit:
+    description: "Whether to check GitHub API rate limits before execution"
+    required: false
+    default: "true"
+
+outputs:
+  example-output:
+    description: "An example output value"
+    value: ${{ steps.main-script.outputs.example-output }}
+
+  execution-time:
+    description: "Script execution time in seconds"
+    value: ${{ steps.main-script.outputs.execution-time }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Validate inputs"
+      shell: bash
+      run: |
+        echo "::group::Validating inputs"
+        source "${{ github.action_path }}/scripts/lib/utils.sh"
+        validate_inputs "${{ inputs.example-input }}" "${{ inputs.working-directory }}" "${{ inputs.log-level }}"
+        echo "::endgroup::"
+
+    - name: "Execute main script"
+      id: main-script
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        INPUT_EXAMPLE_INPUT: ${{ inputs.example-input }}
+        INPUT_WORKING_DIRECTORY: ${{ inputs.working-directory }}
+        INPUT_LOG_LEVEL: ${{ inputs.log-level }}
+        INPUT_INCLUDE_SUMMARY: ${{ inputs.include-summary }}
+        INPUT_CHECK_RATE_LIMIT: ${{ inputs.check-rate-limit }}
+        ACTION_PATH: ${{ github.action_path }}
+      run: |
+        echo "::group::Executing main script"
+        "${{ github.action_path }}/scripts/services/main.sh"
+        echo "::endgroup::"
+
+branding:
+  icon: "terminal"
+  color: "blue"

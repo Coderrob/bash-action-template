@@ -1,0 +1,50 @@
+site_name: Bash Action Template
+site_description: A comprehensive template for creating GitHub Actions using bash scripts with industry best practices
+site_author: Bash Action Template Community
+site_url: https://coderrob.github.io/bash-action-template/
+
+repo_name: bash-action-template
+repo_url: https://github.com/Coderrob/bash-action-template
+edit_uri: edit/main/docs/
+
+copyright: Copyright &copy; 2025 Bash Action Template
+
+plugins:
+  - search
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - meta
+  - tables
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Welcome: getting-started/index.md
+      - Quick Start: getting-started/quick-start.md
+      - Forking & Customizing: getting-started/forking-and-customizing.md
+  - Examples: examples.md
+  - Runbooks:
+      - Quick Fixes: runbooks/quick-fixes.md
+      - Maintenance: runbooks/maintenance.md
+      - Self-Healing: runbooks/self-healing.md
+      - Recovery: runbooks/recovery.md
+  - Contributing: contributing.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Coderrob/bash-action-template
+    - icon: fontawesome/brands/docker
+      link: https://hub.docker.com
+  generator: false
+
+extra_css:
+  - stylesheets/extra.css

@@ -1,0 +1,20 @@
+services:
+  bash-action-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bash-action-template-dev
+    volumes:
+      - .:/workspaces/bash-action-template:cached
+      - /var/run/docker.sock:/var/run/docker.sock
+    working_dir: /workspaces/bash-action-template
+    environment:
+      - SHELL=/bin/bash
+      - PATH=/usr/local/bin:${PATH}
+    command: sleep infinity
+    networks:
+      - bash-action-network
+
+networks:
+  bash-action-network:
+    driver: bridge
